@@ -1,0 +1,44 @@
+<data>
+    <info>
+        <version>0.0</version>
+        <blockIdSize>7</blockIdSize>
+    </info>
+    <blocks>
+        <block name="c_end">
+            <id>0x0</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+        <block name="h_on_start">
+            <id>0x2E</id>
+            <type>hat</type>
+            <family>events</family>
+        </block>
+        <block name="set_status_light">
+            <id>0x16</id>
+            <type>stack</type>
+            <family>display</family>
+            <arguments>
+                <color size="3" type="uint"/>
+            </arguments>
+        </block>
+        <block name="wait_seconds">
+            <id>0x1F</id>
+            <type>stack</type>
+            <family>control</family>
+            <arguments>
+                <seconds size="8" type="uint"/>
+            </arguments>
+        </block>
+        <block name="c_forever">
+            <id>0x38</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+        <block name="c_else">
+            <id>0x7F</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+    </blocks>
+</data>
