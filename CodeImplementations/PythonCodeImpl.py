@@ -9,6 +9,9 @@ class PythonCodeImpl:
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
 
+    def getCode(self):
+        return self.code
+
     def display(self):
         print(self.code)
 

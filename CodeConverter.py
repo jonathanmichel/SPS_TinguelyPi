@@ -18,6 +18,10 @@ class CodeConverter:
             args = ','.join(args)
             print("{}({})".format(c['block'], args))
             """
+        return eval('self.impl.getCode()')
+
+    def getCode(self):
+        self.impl.getCode()
 
     def display(self):
         self.impl.display()

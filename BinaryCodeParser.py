@@ -13,9 +13,11 @@ class BinaryCodeParser:
         self.version = float(info.find("version").text)
         self.idSize = int(info.find("blockIdSize").text)
 
-        print("{} loaded for V{}, block id size is {}".format(self.path, self.version, self.idSize))
+        print("Schema {} loaded for V{}, block id size is {}".format(self.path, self.version, self.idSize))
 
     def parse(self, binary):
+        print("Decoding binary...")
+
         code = []
 
         while binary:
@@ -31,7 +33,9 @@ class BinaryCodeParser:
             binary = binary[argLength:]
             code.append(function_res)
 
-            print(function_res)
+            # print(function_res)
+
+        print("Binary successfully decoded")
 
         return code
 
