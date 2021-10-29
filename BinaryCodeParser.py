@@ -39,19 +39,20 @@ class BinaryCodeParser:
 
         return code
 
-
     def findNextFunction(self, requestId, binaryCode):
         # print("Looking for 0b{} = {}".format(requestId, int(str(requestId), 2)))
         blocks = self.root.find("blocks")
 
         for block in blocks:
+            # Get next function id in the binary chain
             id_hex = block.find("id").text
             id = int(id_hex, 0)
 
+            # Find function id in xml description
             if id == int(str(requestId), 2):
-
                 ret_args = []
 
+                # Get arguments  required by found function
                 args_length = 0
                 args = block.find("arguments")
 
@@ -67,6 +68,8 @@ class BinaryCodeParser:
                             'value': binaryCode[0:arg_size]
                         }
 
+                        binaryCode = binaryCode[arg_size:]
+
                         ret_args.append(ret_arg)
 
                 ret = {
@@ -75,6 +78,8 @@ class BinaryCodeParser:
                     'args_length': args_length,
                     'args': ret_args
                 }
+
+                print(ret)
 
                 return ret
 
@@ -109,7 +114,7 @@ class BinaryCodeParser:
                         else:
                             print("/!\\ Unknown argument type")
 
-                # print("{} found: id={} ({}), args={}".format(requestBlock, id_hex, id_int, ret_args))
+                print("{} found: id={} ({}), args={}".format(requestBlock, id_hex, id_int, ret_args))
 
                 return id_bin + ''.join(ret_args)
 

@@ -9,6 +9,21 @@
             <type>c</type>
             <family>control</family>
         </block>
+        <block name="motors_run_direction">
+            <id>0xD</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <!--1: A, 2: B, 3: C, 4: D -->
+                <port size="2" type="uint"/>
+                <!--1: 0: clockwise (right), 1: counterclockwise (left) -->
+                <direction size="1" type="uint"/>
+                <!-- 0: rotations, 1: degrees, 2: seconds -->
+                <unit size="2" type="uint"/>
+                <!-- 0 ... 255 -->
+                <value size="8" type="uint"/>
+            </arguments>
+        </block>
         <block name="h_on_start">
             <id>0x2E</id>
             <type>hat</type>
