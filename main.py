@@ -2,11 +2,11 @@
 import time
 import sys
 import signal
-from paramiko import SSHClient, AutoAddPolicy
-from scp import SCPClient
 
 from BinaryCodeParser import *
 from CodeConverter import *
+from SshHandler import *
+from FileHandler import *
 from CodeImplementations.Ev3DevCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 
@@ -34,35 +34,16 @@ codeConverter = CodeConverter(pythonImpl)
 code = codeConverter.convert(code)
 codeConverter.display()
 
-main_file_name = 'mainEv3Dev.py'
-ev3_ip = '10.42.0.45'
-ev3_deployment_path = '/home/robot/tinguely/'
+file = FileHandler('config.ini')
+ssh = SshHandler('config.ini')
 
-f = open(main_file_name, "w")
-f.write(code)
-f.close()
-
-print('File ' + main_file_name + ' written')
-
-print('Send ' + main_file_name + ' file to ' + ev3_ip + ':' + ev3_deployment_path)
-
-ssh = SSHClient()
-ssh.set_missing_host_key_policy(AutoAddPolicy())
-ssh.connect(ev3_ip, port=22, username='robot', password='maker')
-
-with SCPClient(ssh.get_transport()) as scp:
-    scp.put(main_file_name, ev3_deployment_path + main_file_name)
-
-print('Execute ' + ev3_ip + ':' + ev3_deployment_path + main_file_name)
-ssh.exec_command('python3 ' + ev3_deployment_path + main_file_name)
+file.write(code)
+ssh.sendFile()
+ssh.executeCode()
 
 try:
     while True:
         pass
 except KeyboardInterrupt:
-    print('Kill program')
-    ssh.exec_command(ev3_deployment_path + 'kill.sh')
+    ssh.stopCode()
     ssh.close()
-
-# codeConverter.execute()
-
