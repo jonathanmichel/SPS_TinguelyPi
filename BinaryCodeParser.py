@@ -26,11 +26,10 @@ class BinaryCodeParser:
             binary = binary[self.idSize:]
             # Extract function and its arguments
             function_res = self.findNextFunction(int(function_id), binary)
-            argLength = int(function_res['args_length'])
-            functionArgsContent = binary[0:argLength]
+            arg_length = int(function_res['args_length'])
 
             # Remove arguments binary data from binary chain
-            binary = binary[argLength:]
+            binary = binary[arg_length:]
             code.append(function_res)
 
             # print(function_res)
@@ -59,15 +58,17 @@ class BinaryCodeParser:
                 if args:
                     for arg in args:
                         arg_size = int(arg.attrib['size'])
+                        # Count total number of bits for arguments
                         args_length += arg_size
 
+                        # Get argument depending on size
                         ret_arg = {
                             'name': arg.tag,
                             'size': arg_size,
                             'type': arg.attrib['type'],
                             'value': binaryCode[0:arg_size]
                         }
-
+                        # Remove current argument from local binary chain
                         binaryCode = binaryCode[arg_size:]
 
                         ret_args.append(ret_arg)
@@ -79,7 +80,7 @@ class BinaryCodeParser:
                     'args': ret_args
                 }
 
-                print(ret)
+                # print(ret)
 
                 return ret
 
@@ -114,7 +115,7 @@ class BinaryCodeParser:
                         else:
                             print("/!\\ Unknown argument type")
 
-                print("{} found: id={} ({}), args={}".format(requestBlock, id_hex, id_int, ret_args))
+                # print("{} found: id={} ({}), args={}".format(requestBlock, id_hex, id_int, ret_args))
 
                 return id_bin + ''.join(ret_args)
 

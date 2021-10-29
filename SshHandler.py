@@ -22,6 +22,7 @@ class SshHandler:
     def sendFile(self):
         with SCPClient(self.sshClient.get_transport()) as scp:
             scp.put(self.main_file_name, self.ev3_deployment_path + self.main_file_name)
+
         print('File ' + self.main_file_name + ' sent to ' +
               self.ev3_username + '@' + self.ev3_ip + ':' + self.ev3_deployment_path)
 
@@ -31,8 +32,8 @@ class SshHandler:
         self.sshClient.exec_command('python3 ' + path)
 
     def stopCode(self):
-        print('Code stopped')
-        self.sshClient.exec_command(self.ev3_deployment_path + 'kill.sh')
+        stdin, stdout, stderr = self.sshClient.exec_command(self.ev3_deployment_path + 'kill.sh')
+        print('Code stopped (Status is {})'.format(stdout.channel.recv_exit_status()))
 
     def close(self):
         self.sshClient.close()

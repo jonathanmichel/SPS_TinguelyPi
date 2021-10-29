@@ -5,10 +5,14 @@ class Ev3DevCodeImpl:
         file_header = """
 # !/usr/bin/env python3
 from time import time, sleep
+
+from PIL import Image
+
 from ev3dev2.display import Display
 from ev3dev2.led import Leds
 from ev3dev2.motor import Motor
-from PIL import Image
+from ev3dev2.sensor.lego import TouchSensor
+from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4 
 
 lcd = Display()
 
@@ -19,8 +23,10 @@ leds.all_off()
 logo = Image.open('/home/robot/pics/EV3.bmp')
 lcd.image.paste(logo, (0,0))
 lcd.update()
-        """
+"""
         self.code += file_header
+        self.motorsPorts = ['A', 'B', 'C', 'D']
+        self.sensorsPorts = ['INPUT_1', 'INPUT_2', 'INPUT_3', 'INPUT_4']
 
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
@@ -72,16 +78,15 @@ lcd.update()
             self.addLine("leds.all_off()")
 
     def motors_run_direction(self, port, direction, unit, value):
-        ports = ['A', 'B', 'C', 'D']
         sign = -1 if direction == 1 else 1
 
         if 0 <= port <= 3:
-            self.addLine("motor = Motor(address='{}')".format(ports[port]))
-            if unit == 0:   # rotations
+            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
+            if unit == 0:       # rotations
                 self.addLine("motor.on_for_rotations(speed=50,rotations={})".format(value * sign))
-            elif unit == 1: # degrees
+            elif unit == 1:     # degrees
                 self.addLine("motor.on_for_degrees(speed=50,degrees={})".format(value * sign))
-            elif unit == 2: # seconds
+            elif unit == 2:     # seconds
                 self.addLine("motor.on_for_seconds(speed=50,seconds={})".format(value * sign))
             else:
                 print("Incorrect unit")
@@ -89,3 +94,36 @@ lcd.update()
         else:
             print("Incorrect port value")
             exit()
+
+    def motors_start_speed(self, port, direction, value):
+        sign = -1 if direction == 1 else 1
+
+        if 0 <= port <= 3:
+            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
+            self.addLine("motor.on(speed={})".format(value * sign))
+        else:
+            print("Incorrect port value for motors_start_speed")
+            exit()
+
+    def motors_stop(self, port):
+        if 0 <= port <= 3:
+            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
+            self.addLine("motor.off()")
+        else:
+            print("Incorrect port value for motors_stop")
+            exit()
+
+    def wait_touch(self, port, state):
+        if 0 <= port <= 3:
+            self.addLine("touch = TouchSensor({})".format(self.sensorsPorts[port]))
+            if state == 0:
+                self.addLine("touch.wait_for_pressed()")
+            elif state == 1:
+                self.addLine("touch.wait_for_released()")
+            else:
+                print("Incorrect state value for wait_touch")
+                exit()
+        else:
+            print("Incorrect port value for wait_touch")
+            exit()
+

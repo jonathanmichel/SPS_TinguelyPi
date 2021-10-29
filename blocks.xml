@@ -10,11 +10,11 @@
             <family>control</family>
         </block>
         <block name="motors_run_direction">
-            <id>0xD</id>
+            <id>0x8</id>
             <type>stack</type>
             <family>motors</family>
             <arguments>
-                <!--1: A, 2: B, 3: C, 4: D -->
+                <!--0: A, 1: B, 2: C, 3: D -->
                 <port size="2" type="uint"/>
                 <!--1: 0: clockwise (right), 1: counterclockwise (left) -->
                 <direction size="1" type="uint"/>
@@ -22,6 +22,28 @@
                 <unit size="2" type="uint"/>
                 <!-- 0 ... 255 -->
                 <value size="8" type="uint"/>
+            </arguments>
+        </block>
+        <block name="motors_start_speed">
+            <id>0xE</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <!--0: A, 1: B, 2: C, 3: D -->
+                <port size="2" type="uint"/>
+                <!--1: 0: clockwise (right), 1: counterclockwise (left) -->
+                <direction size="1" type="uint"/>
+                <!-- 0 ... 255 -->
+                <value size="8" type="uint"/>
+            </arguments>
+        </block>
+        <block name="motors_stop">
+            <id>0xF</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <!--0: A, 1: B, 2: C, 3: D -->
+                <port size="2" type="uint"/>
             </arguments>
         </block>
         <block name="h_on_start">
@@ -34,6 +56,9 @@
             <type>stack</type>
             <family>display</family>
             <arguments>
+                <!-- 0: BLACK, 1: GREEN, 2: RED, 3: ORANGE,
+                4: GREEN_PULSE, 5: RED_PULSE, 6: ORANGE_PULSE -->
+                <!-- /!\ Pulse not implemented  -->
                 <color size="3" type="uint"/>
             </arguments>
         </block>
@@ -43,6 +68,17 @@
             <family>control</family>
             <arguments>
                 <seconds size="8" type="uint"/>
+            </arguments>
+        </block>
+        <block name="wait_touch">
+            <id>0x20</id>
+            <type>stack</type>
+            <family>sensors</family>
+            <arguments>
+                <!--0: Port 1, 1: Port 2, 2: Port 3, 3: Port 4 -->
+                <port size="2" type="uint"/>
+                <!--0: pressed, 1: released -->
+                <state size="2" type="uint"/>
             </arguments>
         </block>
         <block name="c_forever">
