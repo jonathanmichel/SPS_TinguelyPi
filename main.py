@@ -12,32 +12,30 @@ binaryParser = BinaryCodeParser('blocks.xml')
 # Generate binary code
 binaryCode = ''
 binaryCode += binaryParser.getBinary('h_on_start')
-binaryCode += binaryParser.getBinary('c_forever')
-binaryCode += binaryParser.getBinary('wait_touch', {'port': 0, 'state': 0})
-binaryCode += binaryParser.getBinary('motors_start_speed', {'port': 2, 'direction': 1, 'value': 20})
-binaryCode += binaryParser.getBinary('wait_touch', {'port': 0, 'state': 1})
-binaryCode += binaryParser.getBinary('motors_stop', {'port': 2})
-binaryCode += binaryParser.getBinary('c_end')
+binaryCode += binaryParser.getBinary('wait_seconds', {'seconds': 15})
 
+# binaryCode += binaryParser.getBinary('wait_touch', {'port': 0, 'state': 0})
 # binaryCode += binaryParser.getBinary('motors_run_direction', {'port': 1, 'direction': 1, 'value': 180})
 # binaryCode += binaryParser.getBinary('motors_start_speed', {'port': 2, 'direction': 1, 'value': 90})
 # binaryCode += binaryParser.getBinary('motors_stop', {'port': 2})
-# binaryCode += binaryParser.getBinary('wait_seconds', {'seconds': 1})
+# binaryCode += binaryParser.getBinary('wait_seconds', {'seconds': 15})
 # binaryCode += binaryParser.getBinary('c_forever')
 # binaryCode += binaryParser.getBinary('set_status_light', {'color': 1})
 # binaryCode += binaryParser.getBinary('c_end')
 
-print("Binary code is: {}\n".format(binaryCode))
+print("Binary code is: {}".format(hex(int(binaryCode, 2))))
 
 code = binaryParser.parse(binaryCode)
 
+# Chose here which code implementation you want
 # pythonImpl = PythonCodeImpl()
 pythonImpl = Ev3DevCodeImpl()
+
 codeConverter = CodeConverter(pythonImpl)
 code = codeConverter.convert(code)
 codeConverter.display()
 
-# exit()
+exit()
 
 file = FileHandler('config.ini')
 ssh = SshHandler('config.ini')
@@ -45,7 +43,7 @@ ssh = SshHandler('config.ini')
 file.write(code)
 ssh.sendFile()
 
-# exit()
+exit()
 
 ssh.executeCode()
 

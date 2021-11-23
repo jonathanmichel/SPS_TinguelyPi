@@ -1,7 +1,7 @@
 <data>
     <info>
         <version>0.0</version>
-        <blockIdSize>7</blockIdSize>
+        <blockIdSize>8</blockIdSize>
     </info>
     <blocks>
         <block name="c_end">
