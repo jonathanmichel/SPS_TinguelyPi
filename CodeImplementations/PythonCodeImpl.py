@@ -27,7 +27,7 @@ class PythonCodeImpl:
         self.code = ''
 
     def missingImplementationHandler(self, block, args):
-        self.addLine("# /!\\ Missing implementation for {}".format(block))
+        self.addLine("# /!\\ Missing implementation for {}({})".format(block, args))
 
     def c_forever(self):
         self.addLine("while True:")

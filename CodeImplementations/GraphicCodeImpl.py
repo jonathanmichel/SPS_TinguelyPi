@@ -1,31 +1,23 @@
 import time
 
 """
- ______________
-/              \------------------------
+ ____________
+/            \--------------------------
 | when program starts                  |
----     --------------------------------
-   \___/
-___     ________________________________
-|  \___/                               |
-| Wait (5) seconds                     |
----     --------------------------------
-   \___/
-   
-Notch levels
-0:
-3 -> 5 (notch) -> tail 
-___     ________________________________
-|  \___/                               |
----     --------------------------------
-   \___/
-
-1: 
-3 -> 5 (padding) -> 5 (notch) -> tail
-________     ___________________________
-|       \___/                          |
---------     ---------------------------
-        \___/
+|---    --------------------------------
+|   \__/                               |
+| forever                              |
+|   |---    --------------------------------
+|   |   \__/                               |
+|   | wait (13) seconds                    |
+|   |---    --------------------------------
+|   |   \__/                               |
+|   | set status light to [GREEN]          |
+|   ----    ----------------------------
+|       \__/                           |
+|                                    ^ |
+|___    ________________________________
+    \__/
 
 """
 
@@ -56,12 +48,15 @@ class GraphicCodeImpl:
 
     def execute(self):
         print("No execution for Ev3DevCodeImpl")
+        exit()
 
     def clear(self):
         self.code = ''
 
     def missingImplementationHandler(self, block, args):
-        self.addLine("# /!\\ Missing implementation for {}".format(block))
+        print("/!\\ Please implement {}() in GraphicCodeImpl.py".format(block))
+        self.drawStackBlock("[!] Missing implementation for {}({})".format(block, args))
+        #exit()
 
     def c_forever(self):
         self.drawStackBlock("forever", 0, 1)
@@ -78,6 +73,15 @@ class GraphicCodeImpl:
         self.drawStackBlock("wait ({}) seconds".format(seconds))
 
     def set_status_light(self, color):
+        # Scratch colors : 0: off, 1: green, 2: red, 3: orange, 4: green pulse, 5: red pulse, 6: orange pulse
+        # Ev3Python2 colors : 'RED', 'GREEN', 'YELLOW', 'ORANGE, 'AMBER', 'BLACK'
+        colors = ['BLACK', 'GREEN', 'RED', 'ORANGE', 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE']
+        color_int = int(color)
+
+        color = colors[0]
+        if 1 <= color_int <= 6:
+            color = colors[color_int]
+
         self.drawStackBlock("set status light to [{}]".format(color))
 
     def removeLastBlockTail(self):

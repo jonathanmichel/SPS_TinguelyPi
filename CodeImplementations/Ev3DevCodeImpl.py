@@ -65,7 +65,7 @@ lcd.update()
 
     def set_status_light(self, color):
         # Scratch colors : 0: off, 1: green, 2: red, 3: orange, 4: green pulse, 5: red pulse, 6: orange pulse
-        # Ev3Python2 colros : 'RED', 'GREEN', 'YELLOW', 'ORANGE, 'AMBER', 'BLACK'
+        # Ev3Python2 colors : 'RED', 'GREEN', 'YELLOW', 'ORANGE, 'AMBER', 'BLACK'
         colors = ['BLACK', 'GREEN', 'RED', 'ORANGE', 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE']
         color_int = int(color)
 
