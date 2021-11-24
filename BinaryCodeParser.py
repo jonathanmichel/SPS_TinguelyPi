@@ -152,8 +152,8 @@ class BinaryCodeParser:
 
                 ret = id_bin + ''.join(ret_args) + padding
 
-                print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
-                      format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
+                #print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
+                #      format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
 
                 return ret
 
