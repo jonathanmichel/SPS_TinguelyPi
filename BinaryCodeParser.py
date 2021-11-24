@@ -16,6 +16,14 @@ class BinaryCodeParser:
         print("Schema {} loaded for V{}, block id size is {}".format(self.path, self.version, self.idSize))
 
     @staticmethod
+    def convertIntArrayToBinaryChain(int_array):
+        binary_chain = ''
+        for i in int_array:
+            # Convert each element
+            binary_chain += bin(i)[2:].zfill(8)
+        return binary_chain
+
+    @staticmethod
     def calculatePaddingSize(args_length):
         # Each function and its argument(s) are encoded in a given number of byte. Given the fact that
         # arguments could take any number of bits, we need to add zero-padding bits to ensure having a multiple

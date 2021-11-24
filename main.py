@@ -8,23 +8,18 @@ from CodeImplementations.Ev3DevCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 
 
-def convertIntArrayToBinaryChain(intArray):
-    binary_chain = ''
-    for i in intArray:
-        # Convert each element
-        binary_chain += bin(i)[2:].zfill(8)
-    return binary_chain
-
-
 # Load xmlParser
 binaryParser = BinaryCodeParser('blocks.xml')
 
+# Initialize uart communication to read encoded code
+# received from Arduino blocks
+# Default port /dev/ttyUSB0 @9600 Bds
 uartCom = UartCom()
 
 while 1:
     frame = uartCom.readRx()
     if frame:
-        binaryCode = convertIntArrayToBinaryChain(frame)
+        binaryCode = binaryParser.convertIntArrayToBinaryChain(frame)
 
         #  Generate binary code
         # binaryCode = ''
