@@ -137,7 +137,12 @@ class BinaryCodeParser:
                         arg_name = arg.tag
                         arg_size = int(arg.attrib['size'])
                         arg_type = arg.attrib['type']
-                        arg_value = argsList[arg_name]
+                        try:
+                            arg_value = argsList[arg_name]
+                        except KeyError:
+                            print("/!\\ Missing argument '{}' for block '{}' when calling getBinary()"
+                                  .format(arg_name, requestBlock))
+                            return None
 
                         args_length += arg_size
 
@@ -146,6 +151,7 @@ class BinaryCodeParser:
                             ret_args.append(val)
                         else:
                             print("/!\\ Unknown argument type")
+                            return None
 
                 padding_size = self.calculatePaddingSize(args_length)
                 padding = '' + '0' * padding_size
