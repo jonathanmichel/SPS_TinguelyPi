@@ -47,6 +47,9 @@ lcd.update()
     def clear(self):
         self.code = ''
 
+    def missingImplementationHandler(self, block, args):
+        self.addLine("# /!\\ Missing implementation for {}".format(block))
+
     def c_forever(self):
         self.addLine("while True:")
         self.level += 1

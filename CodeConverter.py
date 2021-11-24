@@ -10,7 +10,11 @@ class CodeConverter:
                 args.append("{}={}".format(a['name'], int(a['value'], 2)))
             args = ','.join(args)
 
-            eval('self.impl.' + c['block'] + '(' + args + ')')
+            try:
+                eval('self.impl.' + c['block'] + '(' + args + ')')
+            except:
+                self.impl.missingImplementationHandler(c['block'], args)
+
             """
             args = []
             for a in c['args']:
@@ -18,7 +22,7 @@ class CodeConverter:
             args = ','.join(args)
             print("{}({})".format(c['block'], args))
             """
-        return eval('self.impl.getCode()')
+        return self.impl.getCode()
 
     def getCode(self):
         self.impl.getCode()
