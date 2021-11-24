@@ -38,11 +38,13 @@ while 1:
         print("Binary code is: {}".format(hex(int(binaryCode, 2))))
 
         # Append h_on_start event to code read from arduino, for debug purpose
-        binaryCode = binaryParser.getBinary('h_on_start') + binaryCode
-
+        binaryCode =    binaryParser.getBinary('h_on_start') + \
+                        binaryParser.getBinary('c_forever') + \
+                        binaryCode + \
+                        binaryParser.getBinary('c_end')
         code = binaryParser.parse(binaryCode)
-        if code:
 
+        if code:
             # Chose here which code implementation you want
             # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
             impl = GraphicCodeImpl()
@@ -50,6 +52,7 @@ while 1:
             codeConverter = CodeConverter(impl)
             code = codeConverter.convert(code)
             codeConverter.display()
+
 
 exit()
 

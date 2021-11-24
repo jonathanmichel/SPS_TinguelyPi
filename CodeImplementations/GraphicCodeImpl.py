@@ -64,12 +64,12 @@ class GraphicCodeImpl:
         self.addLine("# /!\\ Missing implementation for {}".format(block))
 
     def c_forever(self):
-        self.drawStackBlock("forever", self.level, self.level + 1)
+        self.drawStackBlock("forever", 0, 1)
         self.level += 1
 
     def c_end(self):
         self.level -= 1
-        self.drawStackBlock(" " * (self.blockLength - 5) + "^", self.level + 1, self.level)
+        self.drawStackBlock(" " * (self.blockLength - 5) + "^", 1, 0, True)
 
     def h_on_start(self):
         self.drawHatBlock("when program starts")
@@ -85,15 +85,26 @@ class GraphicCodeImpl:
             self.code = "\n".join(self.code.split("\n")[:-3])
             self.code += "\n"
 
-    def drawNotchLine(self, level):
-        # ___     ________________________________
-        self.addLine("____" +   # Block header
-                     ("_" * self.notchSize) * level     # Potential block spacing
-                     + (" " * self.notchSize)           # Notch empty zone
-                     + (self.blockLength - 4 - (self.notchSize * level) - self.notchSize) * "_")    # Block end
+    def drawNotchLine(self, char, level, openRoof=False):
+        # level = 0 :
+        # |___     ________________________________
+        # level = 1 : openRoof defines if there is spaces between the start of the text line and
+        # the start of the notch line
+        # |    ___     ____________________________
+        #  /\ here
+        # @todo Improve. Way too complidated. For c_end, openRoof is way too dirty
+        block_begin = "|" + char * (self.levelShiftSize - 1)
+        if openRoof:
+            block_begin = "|" + (self.levelShiftSize - 1) * " " + (level - 1) * " " * (self.levelShiftSize - 2)
 
-    def drawUpperNotch(self, level):
-        self.drawNotchLine(level)
+        endNb = self.blockLength - len(block_begin) - (self.notchSize * level) - self.notchSize
+        self.addLine(block_begin
+                        + (char * self.notchSize) * level  # Potential block spacing
+                        + (" " * self.notchSize)           # Notch empty zone
+                        + endNb * char)                     # Block end
+
+    def drawUpperNotch(self, level, openRoof=False):
+        self.drawNotchLine("-", level, openRoof)
         # |  \___/                               |
         self.addLine("|   " +
                      " " * self.levelShiftSize * level +
@@ -102,7 +113,7 @@ class GraphicCodeImpl:
                      "|")
 
     def drawLowerNotch(self, level):
-        self.drawNotchLine(level)
+        self.drawNotchLine("_", level)
         #     \___/                              |
         self.addLine("    " +
                      (" " * self.notchSize) * level +
@@ -118,9 +129,9 @@ class GraphicCodeImpl:
         self.addLine("| " + functionText + (self.blockLength - len(functionText) - 3) * " " + "|")
         self.drawLowerNotch(0)
 
-    def drawStackBlock(self, functionText, upNotchLevel=0, lowNotchLevel=0):
+    def drawStackBlock(self, functionText, upNotchLevel=0, lowNotchLevel=0, openRoof=False):
         self.removeLastBlockTail()
-        self.drawUpperNotch(upNotchLevel)
+        self.drawUpperNotch(upNotchLevel, openRoof)
         self.addLine("| " + functionText + (self.blockLength - len(functionText) - 3) * " " + "|")
         self.drawLowerNotch(lowNotchLevel)
 
