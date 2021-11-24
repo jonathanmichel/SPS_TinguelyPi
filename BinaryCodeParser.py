@@ -30,8 +30,6 @@ class BinaryCodeParser:
         return paddingSize
 
     def parse(self, binary):
-        print("Decoding binary...")
-
         code = []
 
         while binary:
@@ -40,16 +38,20 @@ class BinaryCodeParser:
             binary = binary[self.idSize:]
             # Extract function and its arguments
             function_res = self.findNextFunction(int(function_id), binary)
-            args_length = int(function_res['args_length'])
+            if function_res:
+                args_length = int(function_res['args_length'])
 
-            # Remove padding bits from binary chain in order to find the next function id
-            args_length += self.calculatePaddingSize(args_length)
+                # Remove padding bits from binary chain in order to find the next function id
+                args_length += self.calculatePaddingSize(args_length)
 
-            # Remove arguments binary data from binary chain
-            binary = binary[args_length:]
-            code.append(function_res)
+                # Remove arguments binary data from binary chain
+                binary = binary[args_length:]
+                code.append(function_res)
 
-            # print(function_res)
+                # print(function_res)
+            else:
+                print("Error decoding binary chain")
+                return None
 
         print("Binary successfully decoded")
 

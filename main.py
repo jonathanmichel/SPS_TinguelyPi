@@ -42,14 +42,15 @@ while 1:
         print("Binary code is: {}".format(hex(int(binaryCode, 2))))
 
         code = binaryParser.parse(binaryCode)
+        if code:
 
-        # Chose here which code implementation you want
-        # impl = PythonCodeImpl()
-        impl = Ev3DevCodeImpl()
+            # Chose here which code implementation you want
+            # impl = PythonCodeImpl()
+            impl = Ev3DevCodeImpl()
 
-        codeConverter = CodeConverter(impl)
-        code = codeConverter.convert(code)
-        codeConverter.display()
+            codeConverter = CodeConverter(impl)
+            code = codeConverter.convert(code)
+            codeConverter.display()
 
 exit()
 
