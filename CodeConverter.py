@@ -28,7 +28,11 @@ class CodeConverter:
         self.impl.getCode()
 
     def display(self):
+        print("=" * 15)
+        print("Converted code with {}".format(self.impl.__class__.__name__))
+        print("=" * 15)
         self.impl.display()
+        print("=" * 15)
 
     def execute(self):
         self.impl.execute()

@@ -47,8 +47,6 @@ while 1:
             exit()
         """
 
-        print("Binary code is: {}".format(hex(int(binaryCode, 2))))
-
         code = binaryParser.parse(binaryCode)
 
         if code:

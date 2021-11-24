@@ -35,11 +35,7 @@ lcd.update()
         return self.code
 
     def display(self):
-        print("=" * 15)
-        print("Converted code for Ev3Dev")
-        print("=" * 15)
         print(self.code)
-        print("=" * 15)
 
     def execute(self):
         print("No execution for Ev3DevCodeImpl")

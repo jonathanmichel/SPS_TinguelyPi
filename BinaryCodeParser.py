@@ -38,6 +38,8 @@ class BinaryCodeParser:
         return paddingSize
 
     def parse(self, binary):
+        print("Parsing binary code: {}".format(hex(int(binary, 2))))
+
         code = []
 
         while binary:
@@ -60,8 +62,6 @@ class BinaryCodeParser:
             else:
                 print("Error decoding binary chain")
                 return None
-
-        print("Binary successfully decoded")
 
         return code
 
