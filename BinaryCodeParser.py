@@ -4,16 +4,30 @@ import xml.etree.ElementTree as ET
 class BinaryCodeParser:
     def __init__(self, path):
         self.path = path
+        self.validXml = False
 
-        self.tree = ET.parse(self.path)
-        self.root = self.tree.getroot()
+        try:
+            self.tree = ET.parse(self.path)
+            self.root = self.tree.getroot()
+        except:
+            print("Invalid xml, check file {}".format(self.path))
 
         info = self.root.find("info")
 
-        self.version = float(info.find("version").text)
-        self.idSize = int(info.find("blockIdSize").text)
+        if info:
+            try:
+                self.version = info.find("version").text
+                self.idSize = int(info.find("blockIdSize").text)
 
-        print("Schema {} loaded for V{}, block id size is {}".format(self.path, self.version, self.idSize))
+                self.validXml = True
+
+                print("Schema {} loaded for V{}, block id size is {} bits".format(self.path, self.version, self.idSize))
+            except:
+                print("Invalid xml, specify version and blockIdSize tags in <info>: {}".format(self.path))
+
+        else:
+            print("Invalid xml, specify info tag in {}".format(self.path))
+
 
     @staticmethod
     def convertIntArrayToBinaryChain(int_array):
@@ -66,6 +80,10 @@ class BinaryCodeParser:
         return code
 
     def findNextFunction(self, requestId, binaryCode):
+        if not self.validXml:
+            print("Unable to findNextFunction(), invalid xml")
+            return None
+
         # print("Looking for 0b{} = {}".format(requestId, int(str(requestId), 2)))
         blocks = self.root.find("blocks")
 
@@ -117,51 +135,118 @@ class BinaryCodeParser:
         return None
 
     def getBinary(self, requestBlock, argsList=None):
+        # Check that xml is correctly loaded
+        if not self.validXml:
+            print("Unable to getBinary(), invalid xml")
+            return None
 
         blocks = self.root.find("blocks")
 
-        for block in blocks:
-            if block.attrib['name'] == requestBlock:
+        if blocks is not None:
+            # Parse all blocks in xml to find the requested block
+            for block in blocks:
+                if block.attrib['name'] == requestBlock:
+                    # Extract id and convert it in binary
+                    try:
+                        id_hex = block.find("id").text
+                        id_int = int(id_hex, 16)
+                        id_bin = bin(id_int)[2:].zfill(self.idSize)
+                    except AttributeError:
+                        print("/!\\ getBinary() failed, please specify 'id' for '{}' in {}"
+                              .format(requestBlock, self.path))
+                        return None
+                    except ValueError:
+                        print("/!\\ getBinary() failed, incorrect 'id' value ({}) for '{}' in {}. Specify id in hex."
+                              .format(id_hex, requestBlock, self.path))
+                        return None
 
-                id_hex = block.find("id").text
-                id_int = int(id_hex, 16)
-                id_bin = bin(id_int)[2:].zfill(self.idSize)
+                    # Get arguments required according to xml definition
+                    args = block.find("arguments")
 
-                args = block.find("arguments")
+                    ret_args = []
+                    args_length = 0
 
-                ret_args = []
-                args_length = 0
+                    if args:
+                        for arg in args:
+                            # Get type and bits size for each argument required according to xml definition
+                            arg_name = arg.tag
 
-                if args:
-                    for arg in args:
-                        arg_name = arg.tag
-                        arg_size = int(arg.attrib['size'])
-                        arg_type = arg.attrib['type']
-                        try:
-                            arg_value = argsList[arg_name]
-                        except KeyError:
-                            print("/!\\ Missing argument '{}' for block '{}' when calling getBinary()"
-                                  .format(arg_name, requestBlock))
-                            return None
+                            try:
+                                arg_size = int(arg.attrib['size'])
+                                arg_type = arg.attrib['type']
+                            except KeyError as e:
+                                print("/!\\ getBinary() for '{}' failed. Please specify {} for argument '{}' in {}"
+                                      .format(requestBlock, e, arg_name, self.path))
+                                return None
 
-                        args_length += arg_size
+                            # Get argument value passed to function
+                            try:
+                                arg_value = argsList[arg_name]
+                            except KeyError:    # If arg is not found in argList
+                                print("/!\\ getBinary() for '{}' failed. "
+                                      "Please specify argument '{}' when calling function."
+                                      .format(requestBlock, arg_name))
+                                return None
+                            except TypeError:   # If argList is empty
+                                print("/!\\ getBinary() for '{}' failed. "
+                                      "Please specify argument '{}' when calling function."
+                                      .format(requestBlock, arg_name))
+                                return None
 
-                        if arg_type == 'uint':
-                            val = bin(arg_value)[2:].zfill(arg_size)
-                            ret_args.append(val)
-                        else:
-                            print("/!\\ Unknown argument type")
-                            return None
+                            # Increment arguments bits size
+                            args_length += arg_size
 
-                padding_size = self.calculatePaddingSize(args_length)
-                padding = '' + '0' * padding_size
+                            # Convert argument value to binary according to its type
+                            try:
+                                if arg_type == 'uint':
+                                    val = bin(arg_value)[2:].zfill(arg_size)
+                                    ret_args.append(val)
+                                elif arg_type == 'enum':
+                                    choices = []
+                                    val = None
 
-                ret = id_bin + ''.join(ret_args) + padding
+                                    for enum in arg:
+                                        if enum.tag == 'enum':
+                                            choices.append("{}".format(enum.text))
+                                            if arg_value == enum.text:
+                                              val = bin(int(enum.attrib['value']))[2:].zfill(arg_size)
 
-                #print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
-                #      format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
+                                    if val:
+                                        ret_args.append(val)
+                                    else:
+                                        choices = ', '.join(choices)
+                                        print("/!\\ getBinary() for '{}' failed. "
+                                              "Invalid value ({}) for argument '{}' in {}.\nChoices are: {}"
+                                              .format(requestBlock, arg_value, arg_name, self.path, choices))
+                                        return None
+                                else:
+                                    print("/!\\ getBinary() for '{}' failed. "
+                                          "Invalid type ({}) for argument '{}' in {}"
+                                          .format(requestBlock,  arg_type, arg_name, self.path))
+                                    return None
+                            except Exception as e:
+                                print(e)
+                            except TypeError:
+                                print("/!\\ getBinary() for '{}' failed. "
+                                      "Unable to use '{}' as '{}' value as requested by argument '{}'"
+                                      .format(requestBlock, arg_value, arg_type, arg_name))
+                                return None
 
-                return ret
+                    # Add padding
+                    padding_size = self.calculatePaddingSize(args_length)
+                    padding = '' + '0' * padding_size
 
-        # If requested block was not found
+                    ret = id_bin + ''.join(ret_args) + padding
+
+                    print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
+                         format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
+
+                    return ret
+
+            # If requested block was not found
+            print("/!\\ Block {} not found in {}".format(requestBlock, self.path))
+            return None
+
+        # If blocks are not correctly defined in xml
+        print("/!\\ Invalid {}, missing tag 'blocks'".format(self.path))
         return None

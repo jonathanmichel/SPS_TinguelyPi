@@ -1,6 +1,6 @@
 <data>
     <info>
-        <version>0.0</version>
+        <version>1.0</version>
         <blockIdSize>8</blockIdSize>
     </info>
     <blocks>
@@ -14,14 +14,22 @@
             <type>stack</type>
             <family>motors</family>
             <arguments>
-                <!--0: A, 1: B, 2: C, 3: D -->
-                <port size="2" type="uint"/>
-                <!--1: 0: clockwise (right), 1: counterclockwise (left) -->
-                <direction size="1" type="uint"/>
-                <!-- 0: rotations, 1: degrees, 2: seconds -->
-                <unit size="2" type="uint"/>
-                <!-- 0 ... 255 -->
-                <value size="8" type="uint"/>
+                <port size="2" type="enum">
+                    <enum value="0">A</enum>
+                    <enum value="1">B</enum>
+                    <enum value="2">C</enum>
+                    <enum value="3">D</enum>
+                </port>
+                <direction size="1" type="enum">
+                    <enum value="0">clockwise</enum> <!-- right -->
+                    <enum value="1">counterclockwise</enum> <!-- left -->
+                </direction>
+                <unit size="2" type="enum">
+                    <enum value="0">rotations</enum>
+                    <enum value="1">degrees</enum>
+                    <enum value="2">seconds</enum>
+                </unit>
+                <value size="8" type="uint"/>  <!-- 0 ... 255 -->
             </arguments>
         </block>
         <block name="motors_start_speed">
@@ -29,21 +37,32 @@
             <type>stack</type>
             <family>motors</family>
             <arguments>
-                <!--0: A, 1: B, 2: C, 3: D -->
-                <port size="2" type="uint"/>
-                <!--1: 0: clockwise (right), 1: counterclockwise (left) -->
-                <direction size="1" type="uint"/>
+                <port size="2" type="enum">
+                    <enum value="0">A</enum>
+                    <enum value="1">B</enum>
+                    <enum value="2">C</enum>
+                    <enum value="3">D</enum>
+                </port>
+                <direction size="1" type="enum">
+                    <enum value="0">clockwise</enum> <!-- right -->
+                    <enum value="1">counterclockwise</enum> <!-- left -->
+                </direction>
                 <!-- 0 ... 255 -->
                 <value size="8" type="uint"/>
             </arguments>
         </block>
+
         <block name="motors_stop">
             <id>0xF</id>
             <type>stack</type>
             <family>motors</family>
             <arguments>
-                <!--0: A, 1: B, 2: C, 3: D -->
-                <port size="2" type="uint"/>
+                <port size="2" type="enum">
+                    <enum value="0">A</enum>
+                    <enum value="1">B</enum>
+                    <enum value="2">C</enum>
+                    <enum value="3">D</enum>
+                </port>
             </arguments>
         </block>
         <block name="h_on_start">
@@ -56,10 +75,16 @@
             <type>stack</type>
             <family>display</family>
             <arguments>
-                <!-- 0: BLACK, 1: GREEN, 2: RED, 3: ORANGE,
-                4: GREEN_PULSE, 5: RED_PULSE, 6: ORANGE_PULSE -->
-                <!-- /!\ Pulse not implemented  -->
-                <color size="3" type="uint"/>
+                <color size="3" type="enum">
+                    <enum value="0">BLACK</enum>
+                    <enum value="1">GREEN</enum>
+                    <enum value="2">RED</enum>
+                    <enum value="3">ORANGE</enum>
+                    <!-- /!\ Pulse not implemented  -->
+                    <enum value="4">GREEN_PULSE</enum>
+                    <enum value="5">RED_PULSE</enum>
+                    <enum value="6">ORANGE_PULSE</enum>
+                </color>
             </arguments>
         </block>
         <block name="wait_seconds">
@@ -75,10 +100,16 @@
             <type>stack</type>
             <family>sensors</family>
             <arguments>
-                <!--0: Port 1, 1: Port 2, 2: Port 3, 3: Port 4 -->
-                <port size="2" type="uint"/>
-                <!--0: pressed, 1: released -->
-                <state size="2" type="uint"/>
+                <port size="2" type="enum">
+                    <enum value="0">1</enum>
+                    <enum value="1">2</enum>
+                    <enum value="2">3</enum>
+                    <enum value="3">4</enum>
+                </port>
+                <state size="2" type="enum">
+                    <enum value="0">pressed</enum>
+                    <enum value="1">release</enum>
+                </state>
             </arguments>
         </block>
         <block name="c_forever">
