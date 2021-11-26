@@ -188,9 +188,13 @@ class BinaryCodeParser:
                                       .format(requestBlock, arg_name))
                                 return None
                             except TypeError:   # If argList is empty
+                                required_args = []
+                                for arg in args:
+                                    required_args.append(arg.tag)
+
                                 print("/!\\ getBinary() for '{}' failed. "
-                                      "Please specify argument '{}' when calling function."
-                                      .format(requestBlock, arg_name))
+                                      "Please specify arguments '{}' when calling function."
+                                      .format(requestBlock, required_args))
                                 return None
 
                             # Increment arguments bits size
@@ -224,8 +228,6 @@ class BinaryCodeParser:
                                           "Invalid type ({}) for argument '{}' in {}"
                                           .format(requestBlock,  arg_type, arg_name, self.path))
                                     return None
-                            except Exception as e:
-                                print(e)
                             except TypeError:
                                 print("/!\\ getBinary() for '{}' failed. "
                                       "Unable to use '{}' as '{}' value as requested by argument '{}'"
@@ -238,8 +240,8 @@ class BinaryCodeParser:
 
                     ret = id_bin + ''.join(ret_args) + padding
 
-                    print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
-                         format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
+                    # print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
+                    #     format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
 
                     return ret
 
