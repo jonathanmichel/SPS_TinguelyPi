@@ -52,32 +52,35 @@ class BinaryCodeParser:
         return paddingSize
 
     def parse(self, binary):
-        print("Parsing binary code: {}".format(hex(int(binary, 2))))
+        if binary:
+            print("Parsing binary code: {}".format(hex(int(binary, 2))))
 
-        code = []
+            code = []
 
-        while binary:
-            # Get functionId and remove it from binary chain
-            function_id = binary[0:self.idSize]
-            binary = binary[self.idSize:]
-            # Extract function and its arguments
-            function_res = self.findNextFunction(int(function_id), binary)
-            if function_res:
-                args_length = int(function_res['args_length'])
+            while binary:
+                # Get functionId and remove it from binary chain
+                function_id = binary[0:self.idSize]
+                binary = binary[self.idSize:]
+                # Extract function and its arguments
+                function_res = self.findNextFunction(int(function_id), binary)
+                if function_res:
+                    args_length = int(function_res['args_length'])
 
-                # Remove padding bits from binary chain in order to find the next function id
-                args_length += self.calculatePaddingSize(args_length)
+                    # Remove padding bits from binary chain in order to find the next function id
+                    args_length += self.calculatePaddingSize(args_length)
 
-                # Remove arguments binary data from binary chain
-                binary = binary[args_length:]
-                code.append(function_res)
+                    # Remove arguments binary data from binary chain
+                    binary = binary[args_length:]
+                    code.append(function_res)
 
-                # print(function_res)
-            else:
-                print("Error decoding binary chain")
-                return None
+                    # print(function_res)
+                else:
+                    print("Error decoding binary chain")
+                    return None
 
-        return code
+            return code
+        else:
+            print("Unable to parse binary, None chain")
 
     def findNextFunction(self, requestId, binaryCode):
         if not self.validXml:

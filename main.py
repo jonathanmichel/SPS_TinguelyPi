@@ -27,13 +27,13 @@ while 1:
     if frame:
         binaryCode = binaryParser.convertIntArrayToBinaryChain(frame)
 
-        # """
+        """
         # Append h_on_start event to code read from arduino, for debug purpose
         binaryCode =    binaryParser.getBinary('h_on_start') + \
                         binaryParser.getBinary('c_forever') + \
                         binaryCode + \
                         binaryParser.getBinary('c_end')
-        # """
+        """
 
         #  Software generated binary code
         """
@@ -53,7 +53,7 @@ while 1:
             print("/!\\ Unable to correctly create binary chain")
             exit()
         """
-        
+
         code = binaryParser.parse(binaryCode)
 
         if code:

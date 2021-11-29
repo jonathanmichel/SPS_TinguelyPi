@@ -10,7 +10,7 @@
             <family>control</family>
         </block>
         <block name="motors_run_direction">
-            <id>0x8</id>
+            <id>0xD</id>
             <type>stack</type>
             <family>motors</family>
             <arguments>
