@@ -70,19 +70,18 @@ lcd.update()
         self.addLine("sleep({})".format(seconds))
 
     def set_status_light(self, color):
-        # Scratch colors : 0: off, 1: green, 2: red, 3: orange, 4: green pulse, 5: red pulse, 6: orange pulse
-        # Ev3Python2 colors : 'RED', 'GREEN', 'YELLOW', 'ORANGE, 'AMBER', 'BLACK'
-        colors = ['BLACK', 'GREEN', 'RED', 'ORANGE', 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE']
-        color_int = int(color)
+        # Scratch colors enum : BLACK, GREEN, RED, ORANGE, GREEN_PULSE, RED_PULSE, ORANGE_PULSE
+        # Ev3Python2 supported colors : BLACK, GREEN, RED, ORANGE, YELLOW, AMBER
+        supported_colors = ['BLACK', 'GREEN', 'RED', 'ORANGE']
 
-        if 1 <= color_int <= 3:
+        # Not supported : 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE'
+
+        if color in supported_colors:
             # Both pairs of LEDs change their color
-            self.addLine("leds.set_color('LEFT', '" + colors[color_int] + "')")
-            self.addLine("leds.set_color('RIGHT', '" + colors[color_int] + "')")
-        elif 4 <= color_int <= 6:
-            print('Pulse not supported for now')
-            exit()
+            self.addLine("leds.set_color('LEFT', '" + color + "')")
+            self.addLine("leds.set_color('RIGHT', '" + color + "')")
         else:
+            self.addLine("# Unsupported color {}".format(color))
             self.addLine("leds.animate_stop()")
             self.addLine("leds.all_off()")
 

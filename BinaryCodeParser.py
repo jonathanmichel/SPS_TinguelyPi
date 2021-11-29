@@ -69,7 +69,7 @@ class BinaryCodeParser:
                 # Extract function and its arguments
                 function_res = self.findNextFunction(int(function_id), binary)
                 if function_res:
-                    args_length = int(function_res['args_length'])
+                    args_length = function_res['args_length']
 
                     # Remove padding bits from binary chain in order to find the next function id
                     args_length += self.calculatePaddingSize(args_length)
@@ -110,8 +110,28 @@ class BinaryCodeParser:
 
                 if args:
                     for arg in args:
-                        # Get number of bits required for current argument
-                        arg_size = int(arg.attrib['size'])
+                        arg_type = arg.attrib['type']
+
+                        # if argument is a binary chain (used for boolean in if block), the size is
+                        # defined by the next byte, otherwise argument size is specified in xml definition
+                        if arg_type == 'binary':
+                            arg_size = 16  # @to read next byte, fixed size for now
+                        else:
+                            arg_size = int(arg.attrib['size'])
+
+                        # Get argument value and convert it according to its type
+                        arg_value = binaryCode[0:arg_size]
+                        if arg_type == 'uint':      # Convert binary value to int
+                            arg_value = int(arg_value, 2)
+                        elif arg_type == 'enum':    # Convert binary value to enum str
+                            enum_value = int(arg_value, 2)  # Convert binary to enum value (int)
+                            arg_value = 'N/A'               # Default str if enum value is invalid
+                            for enum in arg:
+                                # Check if value is available in enum
+                                if enum_value == int(enum.attrib['value']):
+                                    arg_value = enum.text
+                                    break
+
                         # Count total number of bits for arguments
                         args_length += arg_size
 
@@ -119,8 +139,8 @@ class BinaryCodeParser:
                         ret_arg = {
                             'name': arg.tag,
                             'size': arg_size,
-                            'type': arg.attrib['type'],
-                            'value': binaryCode[0:arg_size]
+                            'type': arg_type,
+                            'value': arg_value
                         }
 
                         # Remove current argument from local binary chain
@@ -135,7 +155,7 @@ class BinaryCodeParser:
                     'args': ret_args
                 }
 
-                # print(ret)
+                print(ret)
 
                 return ret
 

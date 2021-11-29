@@ -3,18 +3,34 @@ class CodeConverter:
     def __init__(self, impl):
         self.impl = impl
 
+    # Convert code provided as array
     def convert(self, code):
         self.impl.clearCode()
         for c in code:
             args = []
+            # Create parameters list for function evaluation below depending on arguments array
             for a in c['args']:
-                args.append("{}={}".format(a['name'], int(a['value'], 2)))
+                arg_type = type(a['value'])
+                if arg_type is str:
+                    parameter = "{}='{}'"
+                elif arg_type is int:
+                    parameter = "{}={}"
+                else:
+                    print("/!\\ Non-supported type ({}: {}) when converting code for argument {}".
+                          format(arg_type, a['value'], a['name']))
+                    return None
+
+                args.append(parameter.format(a['name'], a['value']))
             args = ','.join(args)
 
             try:
                 eval('self.impl.' + c['block'] + '(' + args + ')')
-            except:
+            except AttributeError:  # Implementation does not provide code for required function
                 self.impl.missingImplementationHandler(c['block'], args)
+            except Exception as e:  # Another error occured
+                print("/!\\ Error when calling implementation for {}".format(c['block']))
+                print(e)
+                exit()
 
             """
             args = []
