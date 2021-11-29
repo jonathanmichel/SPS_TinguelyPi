@@ -9,10 +9,11 @@ class BinaryCodeParser:
         try:
             self.tree = ET.parse(self.path)
             self.root = self.tree.getroot()
+
+            info = self.root.find("info")
         except:
             print("Invalid xml, check file {}".format(self.path))
-
-        info = self.root.find("info")
+            return
 
         if info:
             try:
@@ -52,6 +53,10 @@ class BinaryCodeParser:
         return paddingSize
 
     def parse(self, binary):
+        if not self.validXml:
+            print("Unable to parse binary, invalid xml")
+            return None
+
         if binary:
             print("Parsing binary code: {}".format(hex(int(binary, 2))))
 
@@ -84,7 +89,7 @@ class BinaryCodeParser:
 
     def findNextFunction(self, requestId, binaryCode):
         if not self.validXml:
-            print("Unable to findNextFunction(), invalid xml")
+            print("Unable to findNextFunction in binary, invalid xml")
             return None
 
         # print("Looking for 0b{} = {}".format(requestId, int(str(requestId), 2)))

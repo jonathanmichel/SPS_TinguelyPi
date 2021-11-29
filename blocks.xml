@@ -117,6 +117,14 @@
             <type>c</type>
             <family>control</family>
         </block>
+        <block name="c_repeat">
+            <id>0x3B</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <times size="8" type="uint"/>
+            </arguments>
+        </block>
         <block name="c_else">
             <id>0x7F</id>
             <type>c</type>
