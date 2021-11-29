@@ -37,13 +37,6 @@ class CodeConverter:
                 print("{} {}".format(type(e), e))
                 exit()
 
-            """
-            args = []
-            for a in c['args']:
-                args.append("{}={}".format(a['name'], int(a['value'], 2)))
-            args = ','.join(args)
-            print("{}({})".format(c['block'], args))
-            """
         return self.impl.getCode()
 
     def getCode(self):
