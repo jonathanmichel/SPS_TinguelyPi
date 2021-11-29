@@ -99,63 +99,11 @@ class BinaryCodeParser:
 
             # Test if function id corresponds to the required one
             if id == function_id:
-                ret_args = []
-
                 # Get argument required by function according to xml
                 args_length = 0
                 args = block.find("arguments")
 
-                if args:
-                    for arg in args:
-                        arg_type = arg.attrib['type']
-
-                        """
-                        # if argument is a binary chain (used for boolean in if block), the size is
-                        # defined by the next byte, otherwise argument size is specified in xml definition
-                        if arg_type == 'binary':
-                            arg_size = 16  # @to read next byte, fixed size for now
-                        else:
-                            arg_size = int(arg.attrib['size'])
-                        """
-
-                        arg_size = int(arg.attrib['size'])
-
-                        # Get argument value and convert it according to its type
-                        arg_value = binaryCode[0:arg_size]
-
-                        print("\tArgument {}, type: {}, size: {}, value: {}"
-                              .format(arg.tag, arg_type, arg_size, arg_value))
-
-                        if arg_type == 'uint':      # Convert binary value to int
-                            arg_value = int(arg_value, 2)
-                        elif arg_type == 'enum':    # Convert binary value to enum str
-                            enum_value = int(arg_value, 2)  # Convert binary to enum value (int)
-                            arg_value = 'N/A'               # Default str if enum value is invalid
-                            for enum in arg:
-                                # Check if value is available in enum
-                                if enum_value == int(enum.attrib['value']):
-                                    arg_value = enum.text
-                                    break
-                        elif arg_type == 'binary':  # Convert binary value to boolean or reporter
-                            exit("Ohoh")
-                            continue
-
-                        # Count total number of bits for arguments
-                        args_length += arg_size
-
-                        # Construct arguments array
-                        ret_arg = {
-                            'name': arg.tag,
-                            # 'size': arg_size,
-                            # 'type': arg_type,
-                            'value': arg_value
-                        }
-
-                        ret_args.append(ret_arg)
-
-                        # Remove current argument from local binary chain
-                        print("\tRemove arg {}".format(arg_size))
-                        binaryCode = binaryCode[arg_size:]
+                (ret_args, binaryCode) = self.decodeArguments(args, binaryCode)
 
                 # Construction function object to return
                 function = {
@@ -165,14 +113,6 @@ class BinaryCodeParser:
                 }
 
                 print("\t{}".format(function))
-
-                # Remove padding bits from binary chain in order to find the next function id
-                padding = self.calculatePaddingSize(args_length)
-
-                print("\t -> Cut {}".format(padding))
-
-                # Remove arguments binary data from binary chain
-                binaryCode = binaryCode[padding:]
 
                 return binaryCode, function
 
@@ -195,9 +135,71 @@ class BinaryCodeParser:
             id_hex = b.find("id").text
             id = int(id_hex, 0)
 
+    def decodeArguments(self, arguments, binaryCode):
+        ret_args = []
+        args_length = 0
 
+        if arguments:
+            for arg in arguments:
+                arg_type = arg.attrib['type']
 
+                """
+                # if argument is a binary chain (used for boolean in if block), the size is
+                # defined by the next byte, otherwise argument size is specified in xml definition
+                if arg_type == 'binary':
+                    arg_size = 16  # @to read next byte, fixed size for now
+                else:
+                    arg_size = int(arg.attrib['size'])
+                """
 
+                arg_size = int(arg.attrib['size'])
+
+                # Get argument value and convert it according to its type
+                arg_value = binaryCode[0:arg_size]
+
+                print("\tArgument {}, type: {}, size: {}, value: {}"
+                      .format(arg.tag, arg_type, arg_size, arg_value))
+
+                if arg_type == 'uint':  # Convert binary value to int
+                    arg_value = int(arg_value, 2)
+                elif arg_type == 'enum':  # Convert binary value to enum str
+                    enum_value = int(arg_value, 2)  # Convert binary to enum value (int)
+                    arg_value = 'N/A'  # Default str if enum value is invalid
+                    for enum in arg:
+                        # Check if value is available in enum
+                        if enum_value == int(enum.attrib['value']):
+                            arg_value = enum.text
+                            break
+                elif arg_type == 'binary':  # Convert binary value to boolean or reporter
+                    exit("Ohoh")
+                    continue
+
+                # Count total number of bits for arguments
+                args_length += arg_size
+
+                # Construct arguments array
+                ret_arg = {
+                    'name': arg.tag,
+                    # 'size': arg_size,
+                    # 'type': arg_type,
+                    'value': arg_value
+                }
+                ret_args.append(ret_arg)
+
+                # Remove current argument from local binary chain
+                binaryCode = binaryCode[arg_size:]
+
+            # Remove padding bits from binary chain in order to find the next function id
+            padding = self.calculatePaddingSize(args_length)
+
+            # Remove arguments binary data from binary chain
+            binaryCode = binaryCode[padding:]
+
+            return ret_args, binaryCode
+
+        # If there is no argument
+        print("Nop")
+        return [], binaryCode
 
 
     def getBinary(self, requestBlock, argsList=None):
