@@ -23,13 +23,18 @@ class CodeConverter:
                 args.append(parameter.format(a['name'], a['value']))
             args = ','.join(args)
 
+            print(args)
+
             try:
                 eval('self.impl.' + c['block'] + '(' + args + ')')
             except AttributeError:  # Implementation does not provide code for required function
                 self.impl.missingImplementationHandler(c['block'], args)
-            except Exception as e:  # Another error occured
-                print("/!\\ Error when calling implementation for {}".format(c['block']))
+            except TypeError as e:  # Incorrect arguments list passed to the implementation
+                print("/!\\ Error when converting {}, incorrect arguments for current implementation.".format(c['block']))
                 print(e)
+            except Exception as e:  # Another error occurred
+                print("/!\\ Error when converting {}".format(c['block']))
+                print("{} {}".format(type(e), e))
                 exit()
 
             """
