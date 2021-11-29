@@ -48,10 +48,6 @@ class GraphicCodeImpl:
 
     def execute(self):
         print("No execution for Ev3DevCodeImpl")
-        exit()
-
-    def clear(self):
-        self.code = ''
 
     def missingImplementationHandler(self, block, args):
         print("/!\\ Please implement {}() in GraphicCodeImpl.py".format(block))
@@ -60,6 +56,15 @@ class GraphicCodeImpl:
 
     def c_forever(self):
         self.drawStackBlock("forever", 0, 1)
+        self.level += 1
+
+    def c_repeat(self, times):
+        self.drawStackBlock("repeat {}".format(times), 0, 1)
+        self.level += 1
+
+    def c_else(self):
+        self.level -= 1
+        self.addLine("else:")
         self.level += 1
 
     def c_end(self):

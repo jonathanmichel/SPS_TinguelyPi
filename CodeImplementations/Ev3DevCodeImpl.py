@@ -2,7 +2,7 @@ class Ev3DevCodeImpl:
     def __init__(self):
         self.code = ''
         self.level = 0
-        file_header = """
+        self.file_header = """
 # !/usr/bin/env python3
 from time import time, sleep
 
@@ -24,12 +24,12 @@ logo = Image.open('/home/robot/pics/EV3.bmp')
 lcd.image.paste(logo, (0,0))
 lcd.update()
 """
-        self.code += file_header
+        self.code += self.file_header
         self.motorsPorts = ['A', 'B', 'C', 'D']
         self.sensorsPorts = ['INPUT_1', 'INPUT_2', 'INPUT_3', 'INPUT_4']
 
     def clearCode(self):
-        self.code = ''
+        self.code = self.file_header
         self.level = 0
 
     def addLine(self, line):
@@ -44,14 +44,20 @@ lcd.update()
     def execute(self):
         print("No execution for Ev3DevCodeImpl")
 
-    def clear(self):
-        self.code = ''
-
     def missingImplementationHandler(self, block, args):
         self.addLine("# /!\\ Missing implementation for {}".format(block))
 
     def c_forever(self):
         self.addLine("while True:")
+        self.level += 1
+
+    def c_repeat(self, times):
+        self.addLine("for i in range({}):".format(times))
+        self.level += 1
+
+    def c_else(self):
+        self.level -= 1
+        self.addLine("else:")
         self.level += 1
 
     def c_end(self):

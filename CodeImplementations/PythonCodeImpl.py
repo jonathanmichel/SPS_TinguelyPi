@@ -23,14 +23,16 @@ class PythonCodeImpl:
         print("Executing code ...")
         exec(self.code)
 
-    def clear(self):
-        self.code = ''
-
     def missingImplementationHandler(self, block, args):
         self.addLine("# /!\\ Missing implementation for {}({})".format(block, args))
 
     def c_forever(self):
         self.addLine("while True:")
+        self.level += 1
+
+    def c_else(self):
+        self.level -= 1
+        self.addLine("else:")
         self.level += 1
 
     def c_end(self):
