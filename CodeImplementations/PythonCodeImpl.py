@@ -6,6 +6,10 @@ class PythonCodeImpl:
         self.code = ''
         self.level = 0
 
+    def clearCode(self):
+        self.code = ''
+        self.level = 0
+
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
 

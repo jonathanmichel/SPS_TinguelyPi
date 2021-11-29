@@ -31,6 +31,10 @@ class GraphicCodeImpl:
         self.notchSize = 4
         self.concatenateBlocks = True
 
+    def clearCode(self):
+        self.code = ''
+        self.level = 0
+
     def addLine(self, line):
         level_indicator_unit = "|" + (self.levelShiftSize - 1) * " "
         level_indicator = level_indicator_unit * self.level

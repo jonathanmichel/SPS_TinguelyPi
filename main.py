@@ -3,14 +3,19 @@ from BinaryCodeParser import BinaryCodeParser
 from CodeConverter import CodeConverter
 from SshHandler import SshHandler
 from FileHandler import FileHandler
-from UartCom import UartCom
 from CodeImplementations.Ev3DevCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
+from UartCom import UartCom
 
 
 # Load xmlParser
 binaryParser = BinaryCodeParser('blocks.xml')
+
+# Chose here which code implementation you want
+# GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
+impl = GraphicCodeImpl()
+codeConverter = CodeConverter(impl)
 
 # Initialize uart communication to read encoded code
 # received from Arduino blocks
@@ -22,11 +27,13 @@ while 1:
     if frame:
         binaryCode = binaryParser.convertIntArrayToBinaryChain(frame)
 
+        # """
         # Append h_on_start event to code read from arduino, for debug purpose
         binaryCode =    binaryParser.getBinary('h_on_start') + \
                         binaryParser.getBinary('c_forever') + \
                         binaryCode + \
                         binaryParser.getBinary('c_end')
+        # """
 
         #  Software generated binary code
         """
@@ -35,26 +42,21 @@ while 1:
             binaryCode += binaryParser.getBinary('h_on_start')
             binaryCode += binaryParser.getBinary('c_forever')
             binaryCode += binaryParser.getBinary('wait_seconds', {'seconds': 15})
-            binaryCode += binaryParser.getBinary('wait_touch', {'port': 0, 'state': 0})
+            binaryCode += binaryParser.getBinary('wait_touch', {'port': '1', 'state': 'pressed'})
             binaryCode += binaryParser.getBinary('motors_run_direction',
-                                                 {'port': 1, 'direction': 1, 'unit': 1, 'value': 180})
-            binaryCode += binaryParser.getBinary('motors_start_speed', {'port': 2, 'direction': 1, 'value': 90})
-            binaryCode += binaryParser.getBinary('motors_stop', {'port': 2})
-            binaryCode += binaryParser.getBinary('set_status_light', {'color': 1})
+                                                 {'port': 'A', 'direction': 'clockwise', 'unit': 'seconds', 'value': 180})
+            binaryCode += binaryParser.getBinary('motors_start_speed', {'port': 'A', 'direction': 'clockwise', 'value': 90})
+            binaryCode += binaryParser.getBinary('motors_stop', {'port': 'A'})
+            binaryCode += binaryParser.getBinary('set_status_light', {'color': 'RED'})
             binaryCode += binaryParser.getBinary('c_end')
         except TypeError:
             print("/!\\ Unable to correctly create binary chain")
             exit()
         """
-
+        
         code = binaryParser.parse(binaryCode)
 
         if code:
-            # Chose here which code implementation you want
-            # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-            impl = GraphicCodeImpl()
-
-            codeConverter = CodeConverter(impl)
             code = codeConverter.convert(code)
             codeConverter.display()
             # codeConverter.execute()

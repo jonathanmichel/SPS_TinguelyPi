@@ -220,7 +220,7 @@ class BinaryCodeParser:
                                     else:
                                         choices = ', '.join(choices)
                                         print("/!\\ getBinary() for '{}' failed. "
-                                              "Invalid value ({}) for argument '{}' in {}.\nChoices are: {}"
+                                              "Invalid value ({}) for argument '{}'.\n According to {}, choices are: {}"
                                               .format(requestBlock, arg_value, arg_name, self.path, choices))
                                         return None
                                 else:

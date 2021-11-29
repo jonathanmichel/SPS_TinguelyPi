@@ -28,6 +28,10 @@ lcd.update()
         self.motorsPorts = ['A', 'B', 'C', 'D']
         self.sensorsPorts = ['INPUT_1', 'INPUT_2', 'INPUT_3', 'INPUT_4']
 
+    def clearCode(self):
+        self.code = ''
+        self.level = 0
+
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
 

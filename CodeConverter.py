@@ -4,6 +4,7 @@ class CodeConverter:
         self.impl = impl
 
     def convert(self, code):
+        self.impl.clearCode()
         for c in code:
             args = []
             for a in c['args']:
