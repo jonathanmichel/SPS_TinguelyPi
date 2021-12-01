@@ -57,22 +57,29 @@ class BinaryCodeParser:
             print("Unable to parse binary, invalid xml")
             return None
 
-        if binary:
-            code = []
-
-            while binary:
-                # Extract function and its arguments
-                (binary, function) = self.decodeFunction(binary)
-
-                if function:
-                    code.append(function)
-                else:
-                    print("Error decoding binary chain")
-                    return None
-
-            return code
+        res = self.checkBinary(binary)
+        if res > 0:
+            print("Converting binary {}".format(hex(int(binary, 2))))
         else:
             print("Unable to parse binary, chain is empty")
+            return None
+
+        code = []
+
+        while binary:
+            # Extract function and its arguments
+            (binary, function) = self.decodeFunction(binary)
+
+            if function:
+                code.append(function)
+            else:
+                print("Error decoding binary chain")
+                return None
+
+        print("\tSuccessfully converted in {} line(s) of code".format(len(code)))
+
+        return code
+
 
     def decodeFunction(self, binaryCode):
         if not self.validXml:
@@ -83,7 +90,7 @@ class BinaryCodeParser:
         function_id_bin = binaryCode[0:self.idSize]
         function_id = int(str(function_id_bin), 2)
 
-        print("Trying to decode function {} in {}".format(hex(function_id), hex(int(binaryCode, 2))))
+        # print("Trying to decode function {} in {}".format(hex(function_id), hex(int(binaryCode, 2))))
 
         # Remove function id from binary chain
         binaryCode = binaryCode[self.idSize:]
@@ -111,7 +118,7 @@ class BinaryCodeParser:
                     'args': ret_args
                 }
 
-                print("\tFunction found: {}".format(function))
+                # print("\tFunction found: {}".format(function))
 
                 return binaryCode, function
 
@@ -128,7 +135,7 @@ class BinaryCodeParser:
         # Get boolean id in binary chain
         boolean_id = int(binaryCode[0:self.idSize], 2)
 
-        print("Trying to decode boolean {} in {}".format(hex(boolean_id), hex(int(binaryCode, 2))))
+        # print("Trying to decode boolean {} in {}".format(hex(boolean_id), hex(int(binaryCode, 2))))
 
         # Remove boolean id from binary chain
         binaryCode = binaryCode[self.idSize:]
@@ -154,7 +161,7 @@ class BinaryCodeParser:
                     'args': ret_args
                 }
 
-                print("\tBoolean found: {}".format(ret))
+                # print("\tBoolean found: {}".format(ret))
 
                 return binaryCode, ret
 
@@ -182,8 +189,8 @@ class BinaryCodeParser:
                 # Get argument value and convert it according to its type
                 arg_value = binaryCode[0:arg_size]
 
-                print("\tArgument found: {} - type: {}, size: {}, value: {}"
-                      .format(arg.tag, arg_type, arg_size, arg_value))
+                # print("\tArgument found: {} - type: {}, size: {}, value: {}"
+                #       .format(arg.tag, arg_type, arg_size, arg_value))
 
                 if arg_type == 'uint':  # Convert binary value to int
                     arg_value = int(arg_value, 2)
@@ -226,117 +233,43 @@ class BinaryCodeParser:
         # If there is no argument
         return [], binaryCode
 
-    def getBinary(self, requestBlock, argsList=None):
+    def encodeFunction(self, functionName, argsList=None):
         # Check that xml is correctly loaded
         if not self.validXml:
-            print("Unable to getBinary(), invalid xml")
+            print("Unable to encode function, invalid xml")
             return None
 
         blocks = self.root.find("blocks")
 
         if blocks is not None:
-            # Parse all blocks in xml to find the requested block
+            # Parse all blocks in xml to find the requested function
             for block in blocks:
-                if block.attrib['name'] == requestBlock:
+                if block.attrib['name'] == functionName:
                     # Extract id and convert it in binary
                     try:
                         id_hex = block.find("id").text
                         id_int = int(id_hex, 16)
                         id_bin = bin(id_int)[2:].zfill(self.idSize)
                     except AttributeError as e:
-                        print("/!\\ getBinary() failed, please specify 'id' for '{}' in {}"
-                              .format(requestBlock, self.path))
+                        print("/!\\ Function encoding failed, please specify 'id' for '{}' in {}"
+                              .format(functionName, self.path))
                         print(e)
                         return None
                     except ValueError:
-                        print("/!\\ getBinary() failed, incorrect 'id' value ({}) for '{}' in {}. Specify id in hex."
-                              .format(id_hex, requestBlock, self.path))
+                        print("/!\\ Function encoding failed, incorrect 'id' value ({}) for '{}' in {}. "
+                              "Specify id in hex."
+                              .format(id_hex, functionName, self.path))
                         return None
 
                     # Get arguments required according to xml definition
                     args = block.find("arguments")
 
-                    ret_args = []
-                    args_length = 0
+                    arguments_binary = self.encodeArguments(args, functionName, argsList)
 
-                    if args:
-                        for arg in args:
-                            # Get type and bits size for each argument required according to xml definition
-                            arg_name = arg.tag
-
-                            try:
-                                arg_type = arg.attrib['type']
-                                if arg_type == 'binary':
-                                    arg_size = 24  # @todo Variable length
-                                else:
-                                    arg_size = int(arg.attrib['size'])
-                            except KeyError as e:
-                                print("/!\\ getBinary() for '{}' failed. Please specify {} for argument '{}' in {}"
-                                      .format(requestBlock, e, arg_name, self.path))
-                                return None
-
-                            # Get argument value passed to function
-                            try:
-                                arg_value = argsList[arg_name]
-                            except KeyError:    # If arg is not found in argList
-                                print("/!\\ getBinary() for '{}' failed. "
-                                      "Please specify argument '{}' when calling function."
-                                      .format(requestBlock, arg_name))
-                                return None
-                            except TypeError:   # If argList is empty
-                                required_args = []
-                                for arg in args:
-                                    required_args.append(arg.tag)
-
-                                print("/!\\ getBinary() for '{}' failed. "
-                                      "Please specify arguments '{}' when calling function."
-                                      .format(requestBlock, required_args))
-                                return None
-
-                            # Increment arguments bits size
-                            args_length += arg_size
-
-                            # Convert argument value to binary according to its type
-                            try:
-                                if arg_type == 'uint':
-                                    val = bin(arg_value)[2:].zfill(arg_size)
-                                    ret_args.append(val)
-                                elif arg_type == 'enum':
-                                    choices = []
-                                    val = None
-
-                                    for enum in arg:
-                                        if enum.tag == 'enum':
-                                            choices.append("{}".format(enum.text))
-                                            if arg_value == enum.text:
-                                              val = bin(int(enum.attrib['value']))[2:].zfill(arg_size)
-
-                                    if val:
-                                        ret_args.append(val)
-                                    else:
-                                        choices = ', '.join(choices)
-                                        print("/!\\ getBinary() for '{}' failed. "
-                                              "Invalid value ({}) for argument '{}'.\n According to {}, choices are: {}"
-                                              .format(requestBlock, arg_value, arg_name, self.path, choices))
-                                        return None
-                                elif arg_type == 'binary':
-                                    ret_args.append(arg_value)
-                                else:
-                                    print("/!\\ getBinary() for '{}' failed. "
-                                          "Invalid type ({}) for argument '{}' in {}"
-                                          .format(requestBlock,  arg_type, arg_name, self.path))
-                                    return None
-                            except TypeError:
-                                print("/!\\ getBinary() for '{}' failed. "
-                                      "Unable to use '{}' as '{}' value as requested by argument '{}'"
-                                      .format(requestBlock, arg_value, arg_type, arg_name))
-                                return None
-
-                    # Add padding
-                    padding_size = self.calculatePaddingSize(args_length)
-                    padding = '' + '0' * padding_size
-
-                    ret = id_bin + ''.join(ret_args) + padding
+                    if arguments_binary is not None:
+                        ret = id_bin + arguments_binary
+                    else:
+                        return None
 
                     # print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
                     #     format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
@@ -344,9 +277,123 @@ class BinaryCodeParser:
                     return ret
 
             # If requested block was not found
-            print("/!\\ Block '{}' not found in {}".format(requestBlock, self.path))
+            print("/!\\ Block '{}' not found in {}".format(functionName, self.path))
             return None
 
         # If blocks are not correctly defined in xml
         print("/!\\ Invalid {}, missing tag 'blocks'".format(self.path))
         return None
+
+    def encodeArguments(self, argsXml, functionName, argsList):
+        ret_args = []
+        args_length = 0
+
+        if argsXml:
+            # Parse all arguments for a specific function
+            for arg_xml in argsXml:
+                # Get type and bits size for each argument required according to xml definition
+                argument = {'name': arg_xml.tag}
+
+                # Get argument value passed to function
+                try:
+                    argument['value'] = argsList[argument['name']]
+                except KeyError:  # If arg is not found in argList
+                    print("/!\\ Function encoding for '{}' failed. "
+                          "Please specify argument '{}' when calling function."
+                          .format(functionName, argument['name']))
+                    return None
+                except TypeError:  # If argList is empty
+                    required_args = []
+                    for a in argsXml:
+                        required_args.append(a.tag)
+
+                    print("/!\\ Function encoding for '{}' failed. "
+                          "Please specify arguments '{}' when calling function."
+                          .format(functionName, required_args))
+                    return None
+
+                # Get argument size, if argument is binary calculate its length
+                try:
+                    argument['type'] = arg_xml.attrib['type']
+                    if argument['type'] == 'binary':
+                        size = self.checkBinary(argument['value'])
+                        if size > 0:
+                            argument['size'] = size
+                        else:
+                            print("/!\\ Function encoding for '{}' failed. "
+                                  "Incorrect binary value '{}' for argument '{}'"
+                                  .format(functionName, argument['value'], argument['name'], self.path))
+                            return None
+                    else:
+                        argument['size'] = int(arg_xml.attrib['size'])
+                except KeyError as e:
+                    print("/!\\ Function encoding for '{}' failed. "
+                          "Please specify {} for argument '{}' in {}"
+                          .format(functionName, e, argument['name'], self.path))
+                    return None
+
+                # Increment arguments bits size
+                args_length += argument['size']
+
+                # Convert argument value to binary according to its type
+                arg_binary = self.encodeArgument(argument, arg_xml, functionName=functionName)
+                if arg_binary is not None:
+                    ret_args.append(arg_binary)
+                else:
+                    return None
+
+        # Add padding
+        padding_size = self.calculatePaddingSize(args_length)
+        padding = '' + '0' * padding_size
+
+        ret = ''.join(ret_args) + padding
+
+        return ret
+
+    # Check that chain is a correct binary chain and returns its length
+    @staticmethod
+    def checkBinary(chain):
+        try:
+            int(chain, 2)
+        except ValueError:
+            return 0
+        except TypeError:
+            return 0
+
+        return len(chain)
+
+    # Convert value to binary chain according to argument type
+    def encodeArgument(self, argument, argumentXml, functionName='not-defined'):
+        try:
+            if argument['type'] == 'uint':
+                return bin(argument['value'])[2:].zfill(argument['size'])
+            elif argument['type'] == 'enum':
+                choices = []
+                val = None
+
+                for enum in argumentXml:
+                    if enum.tag == 'enum':
+                        choices.append("{}".format(enum.text))
+                        if argument['value'] == enum.text:
+                            val = bin(int(enum.attrib['value']))[2:].zfill(argument['size'])
+
+                if val:
+                    return val
+                else:
+                    choices = ', '.join(choices)
+                    print("/!\\ Argument encoding for '{}' failed. "
+                          "Invalid value ({}) for argument '{}'.\n According to {}, choices are: {}"
+                          .format(functionName, argument['value'], argument['name'], self.path, choices))
+                    return None
+            elif argument['type'] == 'binary':
+                return argument['value']
+            else:
+                print("/!\\ Argument encoding for '{}' failed. "
+                      "Invalid type ({}) for argument '{}' in {}"
+                      .format(functionName, type, argument['name'], self.path))
+                return None
+        except TypeError:
+            print("/!\\ Argument encoding for '{}' failed. "
+                  "Unable to use '{}' as '{}' value as requested by argument '{}'"
+                  .format(functionName, argument['value'], type, argument['name']))
+            return None
