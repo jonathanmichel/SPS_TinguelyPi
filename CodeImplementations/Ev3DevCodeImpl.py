@@ -1,5 +1,9 @@
-class Ev3DevCodeImpl:
+from CodeImplementations.CodeImpl import CodeImpl
+
+
+class Ev3DevCodeImpl(CodeImpl):
     def __init__(self):
+        super().__init__()
         self.code = ''
         self.level = 0
         self.file_header = """
@@ -53,6 +57,11 @@ lcd.update()
 
     def c_repeat(self, times):
         self.addLine("for i in range({}):".format(times))
+        self.level += 1
+
+    def c_if(self, boolean):
+        super().boolean(self, boolean)
+        self.addLine("if booleanCheck:")
         self.level += 1
 
     def c_else(self):
@@ -134,4 +143,10 @@ lcd.update()
         else:
             print("Incorrect port value for wait_touch")
             exit()
+
+    def b_touch(self, port):
+        self.addLine("# b_touch {}\nbooleanCheck = False".format(port))
+
+    def b_distance(self, port, operator, value, unit):
+        self.addLine("# b_distance {} {} {} {}\nbooleanCheck = False".format(port, operator, value, unit))
 

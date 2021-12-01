@@ -1,8 +1,10 @@
 import time
+from CodeImplementations.CodeImpl import CodeImpl
 
 
-class PythonCodeImpl:
+class PythonCodeImpl(CodeImpl):
     def __init__(self):
+        super().__init__()
         self.code = ''
         self.level = 0
 
@@ -30,6 +32,11 @@ class PythonCodeImpl:
         self.addLine("while True:")
         self.level += 1
 
+    def c_if(self, boolean):
+        super().boolean(self, boolean)
+        self.addLine("if booleanCheck:")
+        self.level += 1
+
     def c_else(self):
         self.level -= 1
         self.addLine("else:")
@@ -47,3 +54,8 @@ class PythonCodeImpl:
     def set_status_light(self, color):
         self.addLine("print('Set color to {}')".format(color))
 
+    def b_touch(self, port):
+        self.addLine("# b_touch {}\nbooleanCheck = False".format(port))
+
+    def b_distance(self, port, operator, value, unit):
+        self.addLine("# b_distance {} {} {} {}\nbooleanCheck = False".format(port, operator, value, unit))

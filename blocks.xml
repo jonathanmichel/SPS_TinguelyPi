@@ -1,7 +1,7 @@
 <data>
     <info>
         <version>1.0</version>
-        <blockIdSize>8</blockIdSize>
+        <idSize>8</idSize>
     </info>
     <blocks>
         <block name="c_end">
@@ -125,10 +125,54 @@
                 <times size="8" type="uint"/>
             </arguments>
         </block>
+        <block name="c_if">
+            <id>0x39</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
+        </block>
         <block name="c_else">
             <id>0x7F</id>
             <type>c</type>
             <family>control</family>
         </block>
     </blocks>
+
+    <booleans>
+        <boolean name="b_touch">
+            <id>0x43</id>
+            <arguments>
+                <port size="2" type="enum">
+                    <enum value="0">1</enum>
+                    <enum value="1">2</enum>
+                    <enum value="2">3</enum>
+                    <enum value="3">4</enum>
+                </port>
+            </arguments>
+        </boolean>
+        0b10011111
+        <boolean name="b_distance">
+            <id>0x41</id>
+            <arguments>
+                <port size="2" type="enum">
+                    <enum value="0">1</enum>
+                    <enum value="1">2</enum>
+                    <enum value="2">3</enum>
+                    <enum value="3">4</enum>
+                </port>
+                <operator size="2" type="enum">
+                    <enum value="0">equal</enum>
+                    <enum value="1">greater</enum>
+                    <enum value="2">less</enum>
+                </operator>
+                <value size="8" type="uint"/>
+                <unit size="1" type="enum">
+                    <enum value="0">cm</enum>
+                    <enum value="1">inches</enum>
+                </unit>
+            </arguments>
+        </boolean>
+    </booleans>
 </data>

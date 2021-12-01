@@ -1,29 +1,20 @@
+from CodeImplementations.CodeImpl import CodeImpl
+from util import *
+
 
 class CodeConverter:
     def __init__(self, impl):
-        self.impl = impl
+        if issubclass(type(impl), CodeImpl):
+            self.impl = impl
+        else:
+            print("Impossible to convert code. Code implementation has to be a subclass of CodeImpl")
+            exit()
 
     # Convert code provided as array
     def convert(self, code):
         self.impl.clearCode()
         for c in code:
-            args = []
-            # Create parameters list for function evaluation below depending on arguments array
-            for a in c['args']:
-                arg_type = type(a['value'])
-                if arg_type is str:
-                    parameter = "{}='{}'"
-                elif arg_type is int:
-                    parameter = "{}={}"
-                else:
-                    print("/!\\ Non-supported type ({}: {}) when converting code for argument {}".
-                          format(arg_type, a['value'], a['name']))
-                    return None
-
-                args.append(parameter.format(a['name'], a['value']))
-            args = ','.join(args)
-
-            print(args)
+            args = convertArgumentArrayToList(c['args'])
 
             try:
                 eval('self.impl.' + c['block'] + '(' + args + ')')

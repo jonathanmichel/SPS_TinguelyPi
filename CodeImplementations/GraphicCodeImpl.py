@@ -1,4 +1,6 @@
 import time
+from CodeImplementations.CodeImpl import CodeImpl
+from CodeImplementations.AsciiDrawer import AsciiDrawer
 
 """
  ____________
@@ -22,23 +24,16 @@ import time
 """
 
 
-class GraphicCodeImpl:
+class GraphicCodeImpl(CodeImpl):
     def __init__(self):
+        super().__init__()
         self.code = ''
         self.level = 0
-        self.blockLength = 40
-        self.levelShiftSize = 4
-        self.notchSize = 4
-        self.concatenateBlocks = True
+        self.asciiDrawer = AsciiDrawer(self)
 
     def clearCode(self):
         self.code = ''
         self.level = 0
-
-    def addLine(self, line):
-        level_indicator_unit = "|" + (self.levelShiftSize - 1) * " "
-        level_indicator = level_indicator_unit * self.level
-        self.code += "{}{}\n".format(level_indicator, line)
 
     def getCode(self):
         return self.code
@@ -51,98 +46,56 @@ class GraphicCodeImpl:
 
     def missingImplementationHandler(self, block, args):
         print("/!\\ Please implement {}() in GraphicCodeImpl.py".format(block))
-        self.drawStackBlock("[!] Missing implementation for {}({})".format(block, args))
-        #exit()
+        self.asciiDrawer.drawStackBlock("[!] Missing implementation for {}({})".format(block, args))
 
     def c_forever(self):
-        self.drawStackBlock("forever", 0, 1)
+        self.asciiDrawer.drawStackBlock("forever", 0, 1)
         self.level += 1
 
     def c_repeat(self, times):
-        self.drawStackBlock("repeat {}".format(times), 0, 1)
+        self.asciiDrawer.drawStackBlock("repeat {}".format(times), 0, 1)
+        self.level += 1
+
+    def c_if(self, boolean):
+        b = super().boolean(self, boolean)
+        self.asciiDrawer.drawStackBlock("if < {} >".format(b))
         self.level += 1
 
     def c_else(self):
         self.level -= 1
-        self.addLine("else:")
+        self.asciiDrawer.drawStackBlock("else:", openRoof=True, upNotchLevel=1)
         self.level += 1
 
     def c_end(self):
         self.level -= 1
-        self.drawStackBlock(" " * (self.blockLength - 5) + "^", 1, 0, True)
+        self.asciiDrawer.drawStackBlock(" " * (self.asciiDrawer.blockLength - 5) + "^", 1, 0, True)
 
     def h_on_start(self):
-        self.drawHatBlock("when program starts")
+        self.asciiDrawer.drawHatBlock("when program starts")
 
     def wait_seconds(self, seconds):
-        self.drawStackBlock("wait ({}) seconds".format(seconds))
+        self.asciiDrawer.drawStackBlock("wait ({}) seconds".format(seconds))
 
     def set_status_light(self, color):
         # Scratch colors : 0: off, 1: green, 2: red, 3: orange, 4: green pulse, 5: red pulse, 6: orange pulse
         # Ev3Python2 colors : 'RED', 'GREEN', 'YELLOW', 'ORANGE, 'AMBER', 'BLACK'
-        colors = ['BLACK', 'GREEN', 'RED', 'ORANGE', 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE']
-        color_int = int(color)
+        supported_colors = ['BLACK', 'GREEN', 'RED', 'ORANGE']
+        # Not supported : 'GREEN_PULSE', 'RED_PULSE', 'ORANGE_PULSE'
 
-        color = colors[0]
-        if 1 <= color_int <= 6:
-            color = colors[color_int]
+        color_ev3 = 'BLACK'
+        if color in supported_colors:
+            color_ev3 = color
 
-        self.drawStackBlock("set status light to [{}]".format(color))
+        self.asciiDrawer.drawStackBlock("set status light to [{}]".format(color_ev3))
 
-    def removeLastBlockTail(self):
-        if self.concatenateBlocks and self.code != '':
-            self.code = "\n".join(self.code.split("\n")[:-3])
-            self.code += "\n"
+    def motors_stop(self, port):
+        self.asciiDrawer.drawStackBlock("({}) stop motor".format(port))
 
-    def drawNotchLine(self, char, level, openRoof=False):
-        # level = 0 :
-        # |___     ________________________________
-        # level = 1 : openRoof defines if there is spaces between the start of the text line and
-        # the start of the notch line
-        # |    ___     ____________________________
-        #  /\ here
-        # @todo Improve. Way too complidated. For c_end, openRoof is way too dirty
-        block_begin = "|" + char * (self.levelShiftSize - 1)
-        if openRoof:
-            block_begin = "|" + (self.levelShiftSize - 1) * " " + (level - 1) * " " * (self.levelShiftSize - 2)
+    def b_touch(self, port):
+        return "({}) is pressed ?".format(port)
 
-        endNb = self.blockLength - len(block_begin) - (self.notchSize * level) - self.notchSize
-        self.addLine(block_begin
-                        + (char * self.notchSize) * level  # Potential block spacing
-                        + (" " * self.notchSize)           # Notch empty zone
-                        + endNb * char)                     # Block end
-
-    def drawUpperNotch(self, level, openRoof=False):
-        self.drawNotchLine("-", level, openRoof)
-        # |  \___/                               |
-        self.addLine("|   " +
-                     " " * self.levelShiftSize * level +
-                     "\\__/" +
-                     " " * (self.blockLength - self.notchSize - (self.levelShiftSize * level) - 4 - 1) +
-                     "|")
-
-    def drawLowerNotch(self, level):
-        self.drawNotchLine("_", level)
-        #     \___/                              |
-        self.addLine("    " +
-                     (" " * self.notchSize) * level +
-                     "\\__/")
-
-    def drawHatTop(self):
-        hat_size = 12
-        self.addLine(" " + hat_size * "_")
-        self.addLine("/" + hat_size * " " + "\\" + "-" * (self.blockLength - hat_size - 2))
-
-    def drawHatBlock(self, functionText):
-        self.drawHatTop()
-        self.addLine("| " + functionText + (self.blockLength - len(functionText) - 3) * " " + "|")
-        self.drawLowerNotch(0)
-
-    def drawStackBlock(self, functionText, upNotchLevel=0, lowNotchLevel=0, openRoof=False):
-        self.removeLastBlockTail()
-        self.drawUpperNotch(upNotchLevel, openRoof)
-        self.addLine("| " + functionText + (self.blockLength - len(functionText) - 3) * " " + "|")
-        self.drawLowerNotch(lowNotchLevel)
+    def b_distance(self, port, operator, value, unit):
+        return "({}) is distance [{}] ({}) [{}]".format(port, operator, value, unit)
 
 
 

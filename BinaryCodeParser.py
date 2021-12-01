@@ -18,13 +18,13 @@ class BinaryCodeParser:
         if info:
             try:
                 self.version = info.find("version").text
-                self.idSize = int(info.find("blockIdSize").text)
+                self.idSize = int(info.find("idSize").text)
 
                 self.validXml = True
 
                 print("Schema {} loaded for V{}, block id size is {} bits".format(self.path, self.version, self.idSize))
             except:
-                print("Invalid xml, specify version and blockIdSize tags in <info>: {}".format(self.path))
+                print("Invalid xml, specify version and idSize tags in <info>: {}".format(self.path))
 
         else:
             print("Invalid xml, specify info tag in {}".format(self.path))
@@ -83,7 +83,7 @@ class BinaryCodeParser:
         function_id_bin = binaryCode[0:self.idSize]
         function_id = int(str(function_id_bin), 2)
 
-        print("Looking for {} in {}".format(hex(function_id), hex(int(binaryCode, 2))))
+        print("Trying to decode function {} in {}".format(hex(function_id), hex(int(binaryCode, 2))))
 
         # Remove function id from binary chain
         binaryCode = binaryCode[self.idSize:]
@@ -100,7 +100,6 @@ class BinaryCodeParser:
             # Test if function id corresponds to the required one
             if id == function_id:
                 # Get argument required by function according to xml
-                args_length = 0
                 args = block.find("arguments")
 
                 (ret_args, binaryCode) = self.decodeArguments(args, binaryCode)
@@ -112,7 +111,7 @@ class BinaryCodeParser:
                     'args': ret_args
                 }
 
-                print("\t{}".format(function))
+                print("\tFunction found: {}".format(function))
 
                 return binaryCode, function
 
@@ -126,14 +125,43 @@ class BinaryCodeParser:
             print("Unable to decode boolean in binary, invalid xml")
             return None
 
+        # Get boolean id in binary chain
+        boolean_id = int(binaryCode[0:self.idSize], 2)
+
+        print("Trying to decode boolean {} in {}".format(hex(boolean_id), hex(int(binaryCode, 2))))
+
+        # Remove boolean id from binary chain
+        binaryCode = binaryCode[self.idSize:]
+
         booleans = self.root.find("booleans")
 
-        # Get boolean id in binary chain
-        boolean_id = int(binaryCode[0:self.idSize],2)
-        for b in booleans:
+        for bool in booleans:
             # Get boolean id
-            id_hex = b.find("id").text
+            id_hex = bool.find("id").text
             id = int(id_hex, 0)
+
+            # Test if boolean id corresponds to the required one
+            if id == boolean_id:
+                # Get argument required by boolean according to xml
+                args = bool.find("arguments")
+
+                (ret_args, binaryCode) = self.decodeArguments(args, binaryCode)
+
+                # Construction boolean object to return
+                ret = {
+                    'id': id,
+                    'name': bool.attrib['name'],
+                    'args': ret_args
+                }
+
+                print("\tBoolean found: {}".format(ret))
+
+                return binaryCode, ret
+
+        print("Unable to decode boolean {}".format(hex(boolean_id)))
+
+        # If boolean was not found
+        return None, None
 
     def decodeArguments(self, arguments, binaryCode):
         ret_args = []
@@ -143,21 +171,18 @@ class BinaryCodeParser:
             for arg in arguments:
                 arg_type = arg.attrib['type']
 
-                """
-                # if argument is a binary chain (used for boolean in if block), the size is
+                # if argument is a binary chain (used for boolean), the size is
                 # defined by the next byte, otherwise argument size is specified in xml definition
                 if arg_type == 'binary':
-                    arg_size = 16  # @to read next byte, fixed size for now
+                    arg_size = int(binaryCode[0:self.idSize], 2)
+                    binaryCode = binaryCode[self.idSize:]
                 else:
                     arg_size = int(arg.attrib['size'])
-                """
-
-                arg_size = int(arg.attrib['size'])
 
                 # Get argument value and convert it according to its type
                 arg_value = binaryCode[0:arg_size]
 
-                print("\tArgument {}, type: {}, size: {}, value: {}"
+                print("\tArgument found: {} - type: {}, size: {}, value: {}"
                       .format(arg.tag, arg_type, arg_size, arg_value))
 
                 if arg_type == 'uint':  # Convert binary value to int
@@ -171,8 +196,9 @@ class BinaryCodeParser:
                             arg_value = enum.text
                             break
                 elif arg_type == 'binary':  # Convert binary value to boolean or reporter
-                    exit("Ohoh")
-                    continue
+                    (_, arg_value) = self.decodeBoolean(arg_value)
+                    # We do not use binary chain returned by decodeBoolean() because bits are
+                    # already removed from binary chain by the current function
 
                 # Count total number of bits for arguments
                 args_length += arg_size
@@ -198,9 +224,7 @@ class BinaryCodeParser:
             return ret_args, binaryCode
 
         # If there is no argument
-        print("Nop")
         return [], binaryCode
-
 
     def getBinary(self, requestBlock, argsList=None):
         # Check that xml is correctly loaded
@@ -219,9 +243,10 @@ class BinaryCodeParser:
                         id_hex = block.find("id").text
                         id_int = int(id_hex, 16)
                         id_bin = bin(id_int)[2:].zfill(self.idSize)
-                    except AttributeError:
+                    except AttributeError as e:
                         print("/!\\ getBinary() failed, please specify 'id' for '{}' in {}"
                               .format(requestBlock, self.path))
+                        print(e)
                         return None
                     except ValueError:
                         print("/!\\ getBinary() failed, incorrect 'id' value ({}) for '{}' in {}. Specify id in hex."
@@ -240,8 +265,11 @@ class BinaryCodeParser:
                             arg_name = arg.tag
 
                             try:
-                                arg_size = int(arg.attrib['size'])
                                 arg_type = arg.attrib['type']
+                                if arg_type == 'binary':
+                                    arg_size = 24  # @todo Variable length
+                                else:
+                                    arg_size = int(arg.attrib['size'])
                             except KeyError as e:
                                 print("/!\\ getBinary() for '{}' failed. Please specify {} for argument '{}' in {}"
                                       .format(requestBlock, e, arg_name, self.path))
@@ -291,6 +319,8 @@ class BinaryCodeParser:
                                               "Invalid value ({}) for argument '{}'.\n According to {}, choices are: {}"
                                               .format(requestBlock, arg_value, arg_name, self.path, choices))
                                         return None
+                                elif arg_type == 'binary':
+                                    ret_args.append(arg_value)
                                 else:
                                     print("/!\\ getBinary() for '{}' failed. "
                                           "Invalid type ({}) for argument '{}' in {}"
@@ -314,7 +344,7 @@ class BinaryCodeParser:
                     return ret
 
             # If requested block was not found
-            print("/!\\ Block {} not found in {}".format(requestBlock, self.path))
+            print("/!\\ Block '{}' not found in {}".format(requestBlock, self.path))
             return None
 
         # If blocks are not correctly defined in xml
