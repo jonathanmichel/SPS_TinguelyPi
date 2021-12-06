@@ -15,6 +15,20 @@ class CodeImpl(metaclass=abc.ABCMeta):
             except Exception as e:
                 print("Impossible to call boolean implementation.\nError: {}".format(e))
 
+    @staticmethod
+    def checkMotorsPorts(port):
+        supported_values = ['A', 'B', 'C', 'D']
+        if port in supported_values:
+            return True
+        return False
+
+    @staticmethod
+    def checkSensorsPorts(port):
+        supported_values = ['1', '2', '3', '4']
+        if port in supported_values:
+            return True
+        return False
+
     ###############################
     # CodeImpl functions
     ###############################
@@ -80,6 +94,10 @@ class CodeImpl(metaclass=abc.ABCMeta):
         pass
 
     # @abc.abstractmethod
+    # def motors_stop(self, port):
+    #     pass
+
+    # @abc.abstractmethod
     # def motors_run_direction(self, port, direction, unit, value):
     #     pass
 
@@ -87,9 +105,7 @@ class CodeImpl(metaclass=abc.ABCMeta):
     # def motors_start_speed(self, port, direction, value):
     #     pass
 
-    # @abc.abstractmethod
-    # def motors_stop(self, port):
-    #     pass
+
 
     ###############################
     # BOOLEAN IMPLEMENTATIONS

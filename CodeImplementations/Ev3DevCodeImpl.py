@@ -29,8 +29,6 @@ lcd.image.paste(logo, (0,0))
 lcd.update()
 """
         self.code += self.file_header
-        self.motorsPorts = ['A', 'B', 'C', 'D']
-        self.sensorsPorts = ['INPUT_1', 'INPUT_2', 'INPUT_3', 'INPUT_4']
 
     def clearCode(self):
         self.code = self.file_header
@@ -73,7 +71,7 @@ lcd.update()
         self.level -= 1
 
     def h_on_start(self):
-        self.addLine("#[h_on_start]")
+        self.addLine("# [h_on_start]")
 
     def wait_seconds(self, seconds):
         self.addLine("sleep({})".format(seconds))
@@ -97,13 +95,13 @@ lcd.update()
     def motors_run_direction(self, port, direction, unit, value):
         sign = -1 if direction == 1 else 1
 
-        if 0 <= port <= 3:
+        if self.checkSensorsPorts(port):
             self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
-            if unit == 0:       # rotations
+            if unit == 'rotations':
                 self.addLine("motor.on_for_rotations(speed=50,rotations={})".format(value * sign))
-            elif unit == 1:     # degrees
+            elif unit == 'degrees':
                 self.addLine("motor.on_for_degrees(speed=50,degrees={})".format(value * sign))
-            elif unit == 2:     # seconds
+            elif unit == 'seconds':
                 self.addLine("motor.on_for_seconds(speed=50,seconds={})".format(value * sign))
             else:
                 print("Incorrect unit")
@@ -115,27 +113,27 @@ lcd.update()
     def motors_start_speed(self, port, direction, value):
         sign = -1 if direction == 1 else 1
 
-        if 0 <= port <= 3:
-            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
+        if self.checkMotorsPorts(port):
+            self.addLine("motor = Motor(address='{}')".format(port))
             self.addLine("motor.on(speed={})".format(value * sign))
         else:
             print("Incorrect port value for motors_start_speed")
             exit()
 
     def motors_stop(self, port):
-        if 0 <= port <= 3:
-            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
+        if self.checkMotorsPorts(port):
+            self.addLine("motor = Motor(address='{}')".format(port))
             self.addLine("motor.off()")
         else:
             print("Incorrect port value for motors_stop")
             exit()
 
     def wait_touch(self, port, state):
-        if 0 <= port <= 3:
-            self.addLine("touch = TouchSensor({})".format(self.sensorsPorts[port]))
-            if state == 0:
+        if self.checkSensorsPorts(port):
+            self.addLine("touch = TouchSensor({})".format(port))
+            if state == 'pressed':
                 self.addLine("touch.wait_for_pressed()")
-            elif state == 1:
+            elif state == 'released':
                 self.addLine("touch.wait_for_released()")
             else:
                 print("Incorrect state value for wait_touch")

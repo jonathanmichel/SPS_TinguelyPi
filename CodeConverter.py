@@ -17,11 +17,14 @@ class CodeConverter:
             args = convertArgumentArrayToList(c['args'])
 
             try:
-                eval('self.impl.' + c['block'] + '(' + args + ')')
+                function = 'self.impl.' + c['block'] + '(' + args + ')'
+                # print(function)
+                eval(function)
             except AttributeError:  # Implementation does not provide code for required function
                 self.impl.missingImplementationHandler(c['block'], args)
             except TypeError as e:  # Incorrect arguments list passed to the implementation
-                print("/!\\ Error when converting {}, incorrect arguments for current implementation.".format(c['block']))
+                print("/!\\ Error when converting {}, incorrect arguments for current implementation."
+                      .format(c['block']))
                 print(e)
             except Exception as e:  # Another error occurred
                 print("/!\\ Error when converting {}".format(c['block']))
