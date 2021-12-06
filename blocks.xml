@@ -112,6 +112,14 @@
                 </state>
             </arguments>
         </block>
+        <block name="wait_until">
+            <id>0x21</id>
+            <type>stack</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
+        </block>
         <block name="c_forever">
             <id>0x38</id>
             <type>c</type>
@@ -123,6 +131,14 @@
             <family>control</family>
             <arguments>
                 <times size="8" type="uint"/>
+            </arguments>
+        </block>
+        <block name="c_repeat_until">
+            <id>0x3C</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
             </arguments>
         </block>
         <block name="c_if">

@@ -271,37 +271,45 @@ class BinaryCodeParser:
         if elements is not None:
             # Parse all elements (blocks or booleans) in xml to find the requested one
             for element in elements:
-                if element.attrib['name'] == elementName:
-                    # Extract id and convert it in binary
-                    try:
+                try:
+                    current_element_name = element.attrib['name']
+                    if current_element_name == elementName:
+                        # Extract id and convert it in binary
                         id_hex = element.find("id").text
                         id_int = int(id_hex, 16)
                         id_bin = bin(id_int)[2:].zfill(self.idSize)
-                    except AttributeError as e:
-                        print("/!\\ Encoding failed, please specify 'id' for '{}' in {}"
-                              .format(elementName, self.path))
-                        print(e)
-                        return None
-                    except ValueError:
-                        print("/!\\ Encoding failed, incorrect 'id' value ({}) for '{}' in {}. "
-                              "Specify id in hex."
-                              .format(id_hex, elementName, self.path))
-                        return None
 
-                    # Get arguments required according to xml definition
-                    args = element.find("arguments")
+                        # Get arguments required according to xml definition
+                        args = element.find("arguments")
 
-                    arguments_binary = self.encodeArguments(args, elementName, argsList)
+                        arguments_binary = self.encodeArguments(args, elementName, argsList)
 
-                    if arguments_binary is not None:
-                        ret = id_bin + arguments_binary
-                    else:
-                        return None
+                        if arguments_binary is not None:
+                            ret = id_bin + arguments_binary
+                        else:
+                            return None
 
-                    # print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
-                    #     format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
+                        # print("{} found: id={} ({}), args={}, padding={} bits. Code: {}".
+                        #     format(requestBlock, id_hex, id_int, ret_args, padding_size, hex(int(ret, 2))))
 
-                    return ret
+                        return ret
+
+                except KeyError as e:  # When element.attrib['name'] fails
+                    print("/!\\ Encoding failed, please specify attribute {} for '{}' in {}"
+                          .format(e, elementName, self.path))
+                    return None
+
+                except AttributeError as e:  # When element.find("id").text
+                    print("/!\\ Encoding failed, please specify tag 'id' for '{}' in {}"
+                          .format(elementName, self.path))
+                    print(e)
+                    return None
+
+                except ValueError:
+                    print("/!\\ Encoding failed, incorrect 'id' value ({}) for '{}' in {}. "
+                          "Specify id in hex."
+                          .format(id_hex, elementName, self.path))
+                    return None
 
             # If requested element was not found
             print("/!\\ Encoding failed. '{}' not found in {}".format(elementName, self.path))

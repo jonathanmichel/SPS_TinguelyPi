@@ -14,17 +14,16 @@ binaryParser = BinaryCodeParser('blocks.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-impl = GraphicCodeImpl()
+impl = PythonCodeImpl()
 codeConverter = CodeConverter(impl)
 
-# boolean = binaryParser.encodeBoolean('b_touch', {'port': '1'})
-boolean = binaryParser.encodeBoolean('b_distance', {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
+boolean = binaryParser.encodeBoolean('b_touch', {'port': '1'})
+# boolean = binaryParser.encodeBoolean('b_distance', {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
 binaryCode = binaryParser.encodeBlock('h_on_start')
-binaryCode += binaryParser.encodeBlock('c_if', {'boolean': boolean})
+binaryCode += binaryParser.encodeBlock('c_repeat_until', {'boolean': boolean})
 binaryCode += binaryParser.encodeBlock('set_status_light', {'color': 'RED'})
-binaryCode += binaryParser.encodeBlock('c_else')
-binaryCode += binaryParser.encodeBlock('motors_stop', {'port': 'A'})
 binaryCode += binaryParser.encodeBlock('c_end')
+binaryCode += binaryParser.encodeBlock('set_status_light', {'color': 'GREEN'})
 
 code = binaryParser.parse(binaryCode)
 
@@ -60,6 +59,9 @@ while 1:
             binaryCode = ''
             binaryCode += binaryParser.encodeBlock('h_on_start')
             binaryCode += binaryParser.encodeBlock('c_forever')
+            # binaryCode += binaryParser.encodeBlock('repeat_until', {'boolean': boolean})
+            # binaryCode += binaryParser.encodeBlock('wait_until', {'boolean': boolean})
+            # binaryCode += binaryParser.encodeBlock('c_if', {'boolean': boolean})
             binaryCode += binaryParser.encodeBlock('wait_seconds', {'seconds': 15})
             binaryCode += binaryParser.encodeBlock('wait_touch', {'port': '1', 'state': 'pressed'})
             binaryCode += binaryParser.encodeBlock('motors_run_direction',

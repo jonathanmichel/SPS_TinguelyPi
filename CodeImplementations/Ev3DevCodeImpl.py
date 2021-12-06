@@ -57,6 +57,12 @@ lcd.update()
         self.addLine("for i in range({}):".format(times))
         self.level += 1
 
+    def c_repeat_until(self, boolean):
+        super().boolean(self, boolean)
+        self.addLine("while booleanCheck:")
+        self.level += 1
+        super().boolean(self, boolean)
+
     def c_if(self, boolean):
         super().boolean(self, boolean)
         self.addLine("if booleanCheck:")
@@ -75,6 +81,15 @@ lcd.update()
 
     def wait_seconds(self, seconds):
         self.addLine("sleep({})".format(seconds))
+
+    def wait_until(self, boolean):
+        self.addLine("# /// wait_until \\\\\\")
+        self.addLine("booleanCheck = False")
+        self.addLine("while not booleanCheck:")
+        self.level += 1
+        super().boolean(self, boolean)
+        self.level -= 1
+        self.addLine("# \\\\\\ wait_until /// ")
 
     def set_status_light(self, color):
         # Scratch colors enum : BLACK, GREEN, RED, ORANGE, GREEN_PULSE, RED_PULSE, ORANGE_PULSE
@@ -143,8 +158,8 @@ lcd.update()
             exit()
 
     def b_touch(self, port):
-        self.addLine("# b_touch {}\nbooleanCheck = False".format(port))
+        self.addLine("booleanCheck = False # b_touch {}".format(port))
 
     def b_distance(self, port, operator, value, unit):
-        self.addLine("# b_distance {} {} {} {}\nbooleanCheck = False".format(port, operator, value, unit))
+        self.addLine("booleanCheck = False # b_distance {} {} {} {}".format(port, operator, value, unit))
 

@@ -32,6 +32,16 @@ class PythonCodeImpl(CodeImpl):
         self.addLine("while True:")
         self.level += 1
 
+    def c_repeat(self, times):
+        self.addLine("for i in range({}):".format(times))
+        self.level += 1
+
+    def c_repeat_until(self, boolean):
+        super().boolean(self, boolean)
+        self.addLine("while booleanCheck:")
+        self.level += 1
+        super().boolean(self, boolean)
+
     def c_if(self, boolean):
         super().boolean(self, boolean)
         self.addLine("if booleanCheck:")
@@ -51,11 +61,20 @@ class PythonCodeImpl(CodeImpl):
     def wait_seconds(self, seconds):
         self.addLine("time.sleep({})".format(seconds))
 
+    def wait_until(self, boolean):
+        self.addLine("# /// wait_until \\\\\\")
+        self.addLine("booleanCheck = False")
+        self.addLine("while not booleanCheck:")
+        self.level += 1
+        super().boolean(self, boolean)
+        self.level -= 1
+        self.addLine("# \\\\\\ wait_until /// ")
+
     def set_status_light(self, color):
         self.addLine("print('Set color to {}')".format(color))
 
     def b_touch(self, port):
-        self.addLine("# b_touch {}\nbooleanCheck = False".format(port))
+        self.addLine("booleanCheck = False # b_touch {}".format(port))
 
     def b_distance(self, port, operator, value, unit):
-        self.addLine("# b_distance {} {} {} {}\nbooleanCheck = False".format(port, operator, value, unit))
+        self.addLine("booleanCheck = False # b_distance {} {} {} {}".format(port, operator, value, unit))

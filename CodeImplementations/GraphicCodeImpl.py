@@ -56,6 +56,11 @@ class GraphicCodeImpl(CodeImpl):
         self.asciiDrawer.drawStackBlock("repeat {}".format(times), 0, 1)
         self.level += 1
 
+    def c_repeat_until(self, boolean):
+        b = super().boolean(self, boolean)
+        self.asciiDrawer.drawStackBlock("repeat until < {} >".format(b))
+        self.level += 1
+
     def c_if(self, boolean):
         b = super().boolean(self, boolean)
         self.asciiDrawer.drawStackBlock("if < {} >".format(b))
@@ -75,6 +80,10 @@ class GraphicCodeImpl(CodeImpl):
 
     def wait_seconds(self, seconds):
         self.asciiDrawer.drawStackBlock("wait ({}) seconds".format(seconds))
+
+    def wait_until(self, boolean):
+        b = super().boolean(self, boolean)
+        self.asciiDrawer.drawStackBlock("wait until < {} >".format(b))
 
     def set_status_light(self, color):
         # Scratch colors : 0: off, 1: green, 2: red, 3: orange, 4: green pulse, 5: red pulse, 6: orange pulse
