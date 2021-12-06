@@ -80,6 +80,18 @@ class BinaryCodeParser:
 
         return code
 
+    # Check that chain is a correct binary chain and returns its length
+    @staticmethod
+    def checkBinary(chain):
+        try:
+            int(chain, 2)
+        except ValueError:
+            return 0
+        except TypeError:
+            return 0
+
+        return len(chain)
+
     def decodeBlock(self, binaryCode):
         if not self.validXml:
             print("Unable to decode block in binary, invalid xml")
@@ -239,8 +251,10 @@ class BinaryCodeParser:
         binary = self.encode("booleans", booleanName, argsList)
 
         if bin:
+            # Booleans are preceded by one byte that indicates boolean binary size
             length = len(binary)
-            length_bin = bin(length)[2:].zfill(8)  # Encode length in 8 bits
+            # Encode length in 8 bits
+            length_bin = bin(length)[2:].zfill(8)
             return length_bin + binary
 
         return None
@@ -398,15 +412,3 @@ class BinaryCodeParser:
                   "Unable to use '{}' as '{}' value as requested by argument '{}'"
                   .format(elementName, argument['value'], type, argument['name']))
             return None
-
-    # Check that chain is a correct binary chain and returns its length
-    @staticmethod
-    def checkBinary(chain):
-        try:
-            int(chain, 2)
-        except ValueError:
-            return 0
-        except TypeError:
-            return 0
-
-        return len(chain)
