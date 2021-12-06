@@ -152,7 +152,6 @@
                 </port>
             </arguments>
         </boolean>
-        0b10011111
         <boolean name="b_distance">
             <id>0x41</id>
             <arguments>
