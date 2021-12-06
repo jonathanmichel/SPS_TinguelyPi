@@ -6,6 +6,8 @@ class CodeImpl(metaclass=abc.ABCMeta):
     def __init__(self):
         self.name = 'CodeImpl'
 
+    # @todo booleanCheck variable used as flag for boolean verification should have a unique identifier to avoid
+    # issue when conditions are nested. This one should be handled in the global CodeImpl class
     @staticmethod
     def boolean(codeImpl, boolean):
         if issubclass(type(codeImpl), CodeImpl):

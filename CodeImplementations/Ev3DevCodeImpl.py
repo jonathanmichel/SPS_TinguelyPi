@@ -15,7 +15,7 @@ from PIL import Image
 from ev3dev2.display import Display
 from ev3dev2.led import Leds
 from ev3dev2.motor import Motor
-from ev3dev2.sensor.lego import TouchSensor
+from ev3dev2.sensor.lego import TouchSensor, UltrasonicSensor
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4 
 
 lcd = Display()
@@ -158,8 +158,14 @@ lcd.update()
             exit()
 
     def b_touch(self, port):
-        self.addLine("booleanCheck = False # b_touch {}".format(port))
+        if self.checkSensorsPorts(port):
+            self.addLine("# <b_touch {}>".format(port))
+            self.addLine("touch = TouchSensor({})".format(port))
+            self.addLine("booleanCheck = touch.is_pressed")
 
     def b_distance(self, port, operator, value, unit):
-        self.addLine("booleanCheck = False # b_distance {} {} {} {}".format(port, operator, value, unit))
+        if self.checkSensorsPorts(port):
+            self.addLine("# b_distance {} {} {} {}".format(port, operator, value, unit))
+            self.addLine("distance = UltrasonicSensor({})".format(port))
+            self.addLine("booleanCheck = False") # @todo Implement
 

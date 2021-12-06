@@ -14,7 +14,7 @@ binaryParser = BinaryCodeParser('blocks.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-impl = PythonCodeImpl()
+impl = Ev3DevCodeImpl()
 codeConverter = CodeConverter(impl)
 
 boolean = binaryParser.encodeBoolean('b_touch', {'port': '1'})
