@@ -49,21 +49,21 @@ class GraphicCodeImpl(CodeImpl):
         self.asciiDrawer.drawStackBlock("[!] Missing implementation for {}({})".format(block, args))
 
     def c_forever(self):
-        self.asciiDrawer.drawStackBlock("forever", 0, 1)
+        self.asciiDrawer.drawStackBlock("forever", lowNotchLevel=1)
         self.level += 1
 
     def c_repeat(self, times):
-        self.asciiDrawer.drawStackBlock("repeat {}".format(times), 0, 1)
+        self.asciiDrawer.drawStackBlock("repeat {}".format(times), lowNotchLevel=1)
         self.level += 1
 
     def c_repeat_until(self, boolean):
         b = super().boolean(self, boolean)
-        self.asciiDrawer.drawStackBlock("repeat until < {} >".format(b))
+        self.asciiDrawer.drawStackBlock("repeat until < {} >".format(b), lowNotchLevel=1)
         self.level += 1
 
     def c_if(self, boolean):
         b = super().boolean(self, boolean)
-        self.asciiDrawer.drawStackBlock("if < {} >".format(b))
+        self.asciiDrawer.drawStackBlock("if < {} >".format(b), lowNotchLevel=1)
         self.level += 1
 
     def c_else(self):
@@ -73,7 +73,7 @@ class GraphicCodeImpl(CodeImpl):
 
     def c_end(self):
         self.level -= 1
-        self.asciiDrawer.drawStackBlock(" " * (self.asciiDrawer.blockLength - 5) + "^", 1, 0, True)
+        self.asciiDrawer.drawStackBlock(" " * (self.asciiDrawer.blockLength - 5) + "^", upNotchLevel=1, openRoof=True)
 
     def h_on_start(self):
         self.asciiDrawer.drawHatBlock("when program starts")
