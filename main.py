@@ -8,7 +8,6 @@ from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
 from UartCom import UartCom
 
-
 # Load xmlParser
 binaryHandler = BinaryCodeParser('definition.xml')
 
@@ -39,14 +38,14 @@ while 1:
         #  Software generated binary code
         try:
             binaryCode = ''
-            boolean = binaryHandler.encodeBoolean('b_touch', {'port': '1'})
-            boolean = binaryHandler.encodeBoolean('b_distance', 
-                                                {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
-            binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
             binaryCode += binaryHandler.encodeBlock('h_on_start')
-            binaryCode += binaryHandler.encodeBlock('c_forever')
+            boolean = binaryHandler.encodeBoolean('b_touch', {'port': '1'})
+            boolean = binaryHandler.encodeBoolean('b_distance',
+                                                {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
+            # binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
+            #             binaryCode += binaryHandler.encodeBlock('c_forever')
             # binaryCode += binaryHandler.encodeBlock('wait_until', {'boolean': boolean})
-            # binaryCode += binaryHandler.encodeBlock('c_if', {'boolean': boolean})
+            binaryCode += binaryHandler.encodeBlock('c_if', {'boolean': boolean})
             binaryCode += binaryHandler.encodeBlock('wait_seconds', {'seconds': 15})
             binaryCode += binaryHandler.encodeBlock('wait_touch', {'port': '1', 'state': 'pressed'})
             binaryCode += binaryHandler.encodeBlock('motors_run_direction',
@@ -57,6 +56,7 @@ while 1:
             binaryCode += binaryHandler.encodeBlock('motors_stop', {'port': 'A'})
             binaryCode += binaryHandler.encodeBlock('set_status_light', {'color': 'RED'})
             binaryCode += binaryHandler.encodeBlock('c_end')
+
         except TypeError:
             print("/!\\ Unable to correctly create binary chain")
             exit()
