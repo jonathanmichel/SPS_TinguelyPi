@@ -29,7 +29,6 @@ class BinaryCodeParser:
         else:
             print("Invalid xml, specify info tag in {}".format(self.path))
 
-
     @staticmethod
     def convertIntArrayToBinaryChain(int_array):
         binary_chain = ''
@@ -47,10 +46,22 @@ class BinaryCodeParser:
         #   - [block, 8 bits][color, 3 bits] => 5 padding bits : 2 byte for full block
         #   - [block ID, 8 bits][ports, 2 bits][direction, 1 bit][value, 8 bits]
         #       => 5 padding bits : 3 bytes for full block
-        paddingSize = 0
+        padding_size = 0
         if args_length % 8 != 0:
-            paddingSize = 8 - (args_length % 8)
-        return paddingSize
+            padding_size = 8 - (args_length % 8)
+        return padding_size
+
+    # Check that chain is a correct binary chain and returns its length
+    @staticmethod
+    def checkBinary(chain):
+        try:
+            int(chain, 2)
+        except ValueError:
+            return 0
+        except TypeError:
+            return 0
+
+        return len(chain)
 
     def parse(self, binary):
         if not self.validXml:
@@ -79,18 +90,6 @@ class BinaryCodeParser:
         print("\tSuccessfully converted in {} line(s) of code".format(len(code)))
 
         return code
-
-    # Check that chain is a correct binary chain and returns its length
-    @staticmethod
-    def checkBinary(chain):
-        try:
-            int(chain, 2)
-        except ValueError:
-            return 0
-        except TypeError:
-            return 0
-
-        return len(chain)
 
     # Elements can be "blocks" or "booleans"
     def decode(self, rootElement, binaryCode):
@@ -163,23 +162,10 @@ class BinaryCodeParser:
                 # Get argument value and convert it according to its type
                 arg_value = binaryCode[0:arg_size]
 
+                arg_value = self.decodeArgumentValue(arg_type, arg_value, arg)
+
                 # print("\tArgument found: {} - type: {}, size: {}, value: {}"
                 #       .format(arg.tag, arg_type, arg_size, arg_value))
-
-                if arg_type == 'uint':  # Convert binary value to int
-                    arg_value = int(arg_value, 2)
-                elif arg_type == 'enum':  # Convert binary value to enum str
-                    enum_value = int(arg_value, 2)  # Convert binary to enum value (int)
-                    arg_value = 'N/A'  # Default str if enum value is invalid
-                    for enum in arg:
-                        # Check if value is available in enum
-                        if enum_value == int(enum.attrib['value']):
-                            arg_value = enum.text
-                            break
-                elif arg_type == 'binary':  # Convert binary value to boolean or reporter
-                    (_, arg_value) = self.decodeBoolean(arg_value)
-                    # We do not use binary chain returned by decodeBoolean() because bits are
-                    # already removed from binary chain by the current block
 
                 # Count total number of bits for arguments
                 args_length += arg_size
@@ -207,20 +193,24 @@ class BinaryCodeParser:
         # If there is no argument
         return [], binaryCode
 
-    def encodeBlock(self, blockName, argsList=None):
-        return self.encode("blocks", blockName, argsList)
+    def decodeArgumentValue(self, argType, argValue, argumentsXml):
+        arg_value = None
+        if argType == 'uint':  # Convert binary value to int
+            arg_value = int(argValue, 2)
+        elif argType == 'enum':  # Convert binary value to enum str
+            enum_value = int(argValue, 2)  # Convert binary to enum value (int)
+            arg_value = 'N/A'  # Default str if enum value is invalid
+            for enum in argumentsXml:
+                # Check if value is available in enum
+                if enum_value == int(enum.attrib['value']):
+                    arg_value = enum.text
+                    break
+        elif argType == 'binary':  # Convert binary value to boolean or reporter
+            (_, arg_value) = self.decodeBoolean(argValue)
+            # We do not use binary chain returned by decodeBoolean() because bits are
+            # already removed from binary chain by the current block
 
-    def encodeBoolean(self, booleanName, argsList=None):
-        binary = self.encode("booleans", booleanName, argsList)
-
-        if bin:
-            # Booleans are preceded by one byte that indicates boolean binary size
-            length = len(binary)
-            # Encode length in 8 bits
-            length_bin = bin(length)[2:].zfill(8)
-            return length_bin + binary
-
-        return None
+        return arg_value
 
     # rootElement can be "blocks" or "booleans"
     def encode(self, rootElement, elementName, argsList=None):
@@ -282,6 +272,21 @@ class BinaryCodeParser:
         print("/!\\ Invalid {}, missing tag '{}'".format(elements, self.path))
         return None
 
+    def encodeBlock(self, blockName, argsList=None):
+        return self.encode("blocks", blockName, argsList)
+
+    def encodeBoolean(self, booleanName, argsList=None):
+        binary = self.encode("booleans", booleanName, argsList)
+
+        if bin:
+            # Booleans are preceded by one byte that indicates boolean binary size
+            length = len(binary)
+            # Encode length in 8 bits
+            length_bin = bin(length)[2:].zfill(8)
+            return length_bin + binary
+
+        return None
+
     def encodeArguments(self, argsXml, elementName, argsList):
         ret_args = []
         args_length = 0
@@ -334,7 +339,7 @@ class BinaryCodeParser:
                 args_length += argument['size']
 
                 # Convert argument value to binary according to its type
-                arg_binary = self.convertArgument(argument, arg_xml, elementName=elementName)
+                arg_binary = self.encodeArgumentValue(argument, arg_xml, elementName=elementName)
                 if arg_binary is not None:
                     ret_args.append(arg_binary)
                 else:
@@ -349,7 +354,7 @@ class BinaryCodeParser:
         return ret
 
     # Convert value to binary chain according to argument type
-    def convertArgument(self, argument, argumentXml, elementName='not-defined'):
+    def encodeArgumentValue(self, argument, argumentsXml, elementName='not-defined'):
         try:
             if argument['type'] == 'uint':
                 return bin(argument['value'])[2:].zfill(argument['size'])
@@ -357,7 +362,7 @@ class BinaryCodeParser:
                 choices = []
                 val = None
 
-                for enum in argumentXml:
+                for enum in argumentsXml:
                     if enum.tag == 'enum':
                         choices.append("{}".format(enum.text))
                         if argument['value'] == enum.text:
