@@ -10,11 +10,11 @@ from CodeImplementations.GraphicCodeImpl import *
 
 
 # Load xmlParser
-binaryParser = BinaryCodeParser('blocks.xml')
+binaryParser = BinaryCodeParser('definition.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-impl = Ev3DevCodeImpl()
+impl = GraphicCodeImpl()
 codeConverter = CodeConverter(impl)
 
 boolean = binaryParser.encodeBoolean('b_touch', {'port': '1'})

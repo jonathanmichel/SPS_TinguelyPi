@@ -92,94 +92,57 @@ class BinaryCodeParser:
 
         return len(chain)
 
-    def decodeBlock(self, binaryCode):
+    # Elements can be "blocks" or "booleans"
+    def decode(self, rootElement, binaryCode):
         if not self.validXml:
-            print("Unable to decode block in binary, invalid xml")
+            print("Decoding failed, invalid xml")
             return None, None
 
-        # Get blockId and remove it from binary chain
-        block_id_bin = binaryCode[0:self.idSize]
-        block_id = int(str(block_id_bin), 2)
+        # Get element id in binary chain
+        element_id_bin = binaryCode[0:self.idSize]
+        element_id = int(str(element_id_bin), 2)
 
-        # print("Trying to decode block {} in {}".format(hex(block_id), hex(int(binaryCode, 2))))
-
-        # Remove block id from binary chain
-        binaryCode = binaryCode[self.idSize:]
-
-        # Get all blocks (functions) in xml definition
-        blocks = self.root.find("blocks")
-
-        # Parse all blocks to find the required one
-        for block in blocks:
-            # For each of them, get block id
-            id_hex = block.find("id").text
-            id = int(id_hex, 0)
-
-            # Test if block id corresponds to the required one
-            if id == block_id:
-                # Get argument required by block according to xml
-                args = block.find("arguments")
-
-                (ret_args, binaryCode) = self.decodeArguments(args, binaryCode)
-
-                # Construction block object to return
-                block = {
-                    'id': id,
-                    'block': block.attrib['name'],
-                    'args': ret_args
-                }
-
-                # print("\Block found: {}".format(block))
-
-                return binaryCode, block
-
-        print("Unable to decode block {}".format(hex(block_id)))
-
-        # If block was not found
-        return None, None
-
-    def decodeBoolean(self, binaryCode):
-        if not self.validXml:
-            print("Unable to decode boolean in binary, invalid xml")
-            return None
-
-        # Get boolean id in binary chain
-        boolean_id = int(binaryCode[0:self.idSize], 2)
-
-        # print("Trying to decode boolean {} in {}".format(hex(boolean_id), hex(int(binaryCode, 2))))
+        # print("Trying to decode {} {} in {}".format(rootElement, hex(element_id), hex(int(binaryCode, 2))))
 
         # Remove boolean id from binary chain
         binaryCode = binaryCode[self.idSize:]
 
-        booleans = self.root.find("booleans")
+        elements = self.root.find(rootElement)
 
-        for bool in booleans:
-            # Get boolean id
-            id_hex = bool.find("id").text
+        # Parse all elements to find the required one
+        for element in elements:
+            # For each of them, get id
+            id_hex = element.find("id").text
             id = int(id_hex, 0)
 
-            # Test if boolean id corresponds to the required one
-            if id == boolean_id:
-                # Get argument required by boolean according to xml
-                args = bool.find("arguments")
+            # Test if element id corresponds to the required one
+            if id == element_id:
+                # Get argument required by element according to xml
+                args = element.find("arguments")
 
                 (ret_args, binaryCode) = self.decodeArguments(args, binaryCode)
 
-                # Construction boolean object to return
+                # Construction element object to return
                 ret = {
                     'id': id,
-                    'name': bool.attrib['name'],
+                    'name': element.attrib['name'],
                     'args': ret_args
                 }
 
-                # print("\tBoolean found: {}".format(ret))
+                # print("\Element found in {}: {}".format(rootElement, ret))
 
                 return binaryCode, ret
 
-        print("Unable to decode boolean {}".format(hex(boolean_id)))
+        print("Decoding failed for {}".format(hex(element_id)))
 
-        # If boolean was not found
+        # If element was not found
         return None, None
+
+    def decodeBlock(self, binaryCode):
+        return self.decode("blocks", binaryCode)
+
+    def decodeBoolean(self, binaryCode):
+        return self.decode("booleans", binaryCode)
 
     def decodeArguments(self, arguments, binaryCode):
         ret_args = []
@@ -259,14 +222,14 @@ class BinaryCodeParser:
 
         return None
 
-    # Elements can be "blocks" or "booleans"
-    def encode(self, elements, elementName, argsList=None):
+    # rootElement can be "blocks" or "booleans"
+    def encode(self, rootElement, elementName, argsList=None):
         # Check that xml is correctly loaded
         if not self.validXml:
             print("Unable to encode, invalid xml")
             return None
 
-        elements = self.root.find(elements)
+        elements = self.root.find(rootElement)
 
         if elements is not None:
             # Parse all elements (blocks or booleans) in xml to find the requested one
@@ -371,7 +334,7 @@ class BinaryCodeParser:
                 args_length += argument['size']
 
                 # Convert argument value to binary according to its type
-                arg_binary = self.encodeArgument(argument, arg_xml, elementName=elementName)
+                arg_binary = self.convertArgument(argument, arg_xml, elementName=elementName)
                 if arg_binary is not None:
                     ret_args.append(arg_binary)
                 else:
@@ -386,7 +349,7 @@ class BinaryCodeParser:
         return ret
 
     # Convert value to binary chain according to argument type
-    def encodeArgument(self, argument, argumentXml, elementName='not-defined'):
+    def convertArgument(self, argument, argumentXml, elementName='not-defined'):
         try:
             if argument['type'] == 'uint':
                 return bin(argument['value'])[2:].zfill(argument['size'])
