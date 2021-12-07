@@ -171,6 +171,10 @@
                     <enum value="1">greater</enum>
                     <enum value="2">less</enum>
                 </operator>
+                <sign size="1" type="enum">
+                    <enum value="0">positive</enum>
+                    <enum value="1">negative</enum>
+                </sign>
                 <value size="8" type="uint"/>
                 <unit size="1" type="enum">
                     <enum value="0">cm</enum>

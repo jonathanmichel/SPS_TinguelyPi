@@ -183,8 +183,8 @@ lcd.update()
             self.addLine("touch = TouchSensor({})".format(port))
             self.addLine("booleanCheck = touch.is_pressed")
 
-    def b_distance(self, port, operator, value, unit):
+    def b_distance(self, port, operator, sign, value, unit):
         if self.checkSensorsPorts(port):
-            self.addLine("# b_distance {} {} {} {}".format(port, operator, value, unit))
+            self.addLine("# b_distance {} {} {} {}".format(port, operator, sign, value, unit))
             self.addLine("distance = UltrasonicSensor({})".format(port))
             self.addLine("booleanCheck = False")  # @todo Implement
