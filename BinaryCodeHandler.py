@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-
+from math import *
 
 class BinaryCodeParser:
     def __init__(self, path):
@@ -151,10 +151,10 @@ class BinaryCodeParser:
             for arg in arguments:
                 arg_type = arg.attrib['type']
 
-                # if argument is a binary chain (used for boolean), the size is
-                # defined by the next byte, otherwise argument size is specified in xml definition
+                # if argument is a binary chain (used for boolean), the size (in bytes) is
+                # defined by the next byte, otherwise argument size (in bits) is specified in xml definition
                 if arg_type == 'binary':
-                    arg_size = int(binaryCode[0:self.idSize], 2)
+                    arg_size = int(binaryCode[0:self.idSize], 2) * 8
                     binaryCode = binaryCode[self.idSize:]
                 else:
                     arg_size = int(arg.attrib['size'])
@@ -279,10 +279,12 @@ class BinaryCodeParser:
         binary = self.encode("booleans", booleanName, argsList)
 
         if bin:
-            # Booleans are preceded by one byte that indicates boolean binary size
-            length = len(binary)
-            # Encode length in 8 bits
-            length_bin = bin(length)[2:].zfill(8)
+            # Booleans are preceded by one byte that indicates boolean binary size in bytes
+            bits_length = len(binary)
+            bytes_length = ceil(bits_length / 8)
+
+            # Encode length in on byte
+            length_bin = bin(bytes_length)[2:].zfill(8)
             return length_bin + binary
 
         return None
