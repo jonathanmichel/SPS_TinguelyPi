@@ -56,6 +56,10 @@ class CodeImpl(metaclass=abc.ABCMeta):
     ###############################
 
     @abc.abstractmethod
+    def c_end(self):
+        pass
+
+    @abc.abstractmethod
     def c_forever(self):
         pass
 
@@ -64,11 +68,15 @@ class CodeImpl(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def c_else(self):
+    def c_repeat(self, times):
         pass
 
     @abc.abstractmethod
-    def c_end(self):
+    def c_repeat_until(self, boolean):
+        pass
+
+    @abc.abstractmethod
+    def c_else(self):
         pass
 
     ###############################
@@ -84,30 +92,32 @@ class CodeImpl(metaclass=abc.ABCMeta):
     ###############################
 
     @abc.abstractmethod
-    def wait_seconds(self, seconds):
+    def motors_run_direction(self, port, direction, unit, value):
         pass
 
-    # @abc.abstractmethod
-    # def wait_touch(self, port, state):
-    #     pass
+    @abc.abstractmethod
+    def motors_start_speed(self, port, direction, speed):
+        pass
+
+    @abc.abstractmethod
+    def motors_stop(self, port):
+        pass
 
     @abc.abstractmethod
     def set_status_light(self, color):
         pass
 
-    # @abc.abstractmethod
-    # def motors_stop(self, port):
-    #     pass
+    @abc.abstractmethod
+    def wait_seconds(self, seconds):
+        pass
 
-    # @abc.abstractmethod
-    # def motors_run_direction(self, port, direction, unit, value):
-    #     pass
+    @abc.abstractmethod
+    def wait_touch(self, port, state):
+        pass
 
-    # @abc.abstractmethod
-    # def motors_start_speed(self, port, direction, value):
-    #     pass
-
-
+    @abc.abstractmethod
+    def wait_until(self, boolean):
+        pass
 
     ###############################
     # BOOLEAN IMPLEMENTATIONS
@@ -115,4 +125,8 @@ class CodeImpl(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def b_touch(self, port):
+        pass
+
+    @abc.abstractmethod
+    def b_distance(self, port, operator, value, unit):
         pass

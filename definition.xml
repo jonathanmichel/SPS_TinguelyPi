@@ -1,6 +1,6 @@
 <data>
     <info>
-        <version>1.0</version>
+        <version>2.0</version>
         <idSize>8</idSize>
     </info>
     <blocks>
@@ -65,11 +65,6 @@
                 </port>
             </arguments>
         </block>
-        <block name="h_on_start">
-            <id>0x2E</id>
-            <type>hat</type>
-            <family>events</family>
-        </block>
         <block name="set_status_light">
             <id>0x16</id>
             <type>stack</type>
@@ -120,10 +115,23 @@
                 <boolean type="binary"/>
             </arguments>
         </block>
+        <block name="h_on_start">
+            <id>0x2E</id>
+            <type>hat</type>
+            <family>events</family>
+        </block>
         <block name="c_forever">
             <id>0x38</id>
             <type>c</type>
             <family>control</family>
+        </block>
+        <block name="c_if">
+            <id>0x39</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
         </block>
         <block name="c_repeat">
             <id>0x3B</id>
@@ -141,14 +149,6 @@
                 <boolean type="binary"/>
             </arguments>
         </block>
-        <block name="c_if">
-            <id>0x39</id>
-            <type>c</type>
-            <family>control</family>
-            <arguments>
-                <boolean type="binary"/>
-            </arguments>
-        </block>
         <block name="c_else">
             <id>0x7F</id>
             <type>c</type>
@@ -157,17 +157,6 @@
     </blocks>
 
     <booleans>
-        <boolean name="b_touch">
-            <id>0x43</id>
-            <arguments>
-                <port size="2" type="enum">
-                    <enum value="0">1</enum>
-                    <enum value="1">2</enum>
-                    <enum value="2">3</enum>
-                    <enum value="3">4</enum>
-                </port>
-            </arguments>
-        </boolean>
         <boolean name="b_distance">
             <id>0x41</id>
             <arguments>
@@ -187,6 +176,17 @@
                     <enum value="0">cm</enum>
                     <enum value="1">inches</enum>
                 </unit>
+            </arguments>
+        </boolean>
+        <boolean name="b_touch">
+            <id>0x43</id>
+            <arguments>
+                <port size="2" type="enum">
+                    <enum value="0">1</enum>
+                    <enum value="1">2</enum>
+                    <enum value="2">3</enum>
+                    <enum value="3">4</enum>
+                </port>
             </arguments>
         </boolean>
     </booleans>

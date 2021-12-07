@@ -40,23 +40,27 @@ while 1:
             binaryCode = ''
             binaryCode += binaryHandler.encodeBlock('h_on_start')
             boolean = binaryHandler.encodeBoolean('b_touch', {'port': '1'})
-            boolean = binaryHandler.encodeBoolean('b_distance',
-                                                {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
-            # binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
-            #             binaryCode += binaryHandler.encodeBlock('c_forever')
-            # binaryCode += binaryHandler.encodeBlock('wait_until', {'boolean': boolean})
             binaryCode += binaryHandler.encodeBlock('c_if', {'boolean': boolean})
-            binaryCode += binaryHandler.encodeBlock('wait_seconds', {'seconds': 15})
-            binaryCode += binaryHandler.encodeBlock('wait_touch', {'port': '1', 'state': 'pressed'})
             binaryCode += binaryHandler.encodeBlock('motors_run_direction',
                                                     {'port': 'A', 'direction': 'clockwise',
-                                                    'unit': 'seconds', 'value': 180})
-            binaryCode += binaryHandler.encodeBlock('motors_start_speed', 
-                                                     {'port': 'A', 'direction': 'clockwise', 'speed': 90})
+                                                     'unit': 'seconds', 'value': 180})
+            binaryCode += binaryHandler.encodeBlock('c_else')
+            binaryCode += binaryHandler.encodeBlock('motors_start_speed',
+                                                    {'port': 'A', 'direction': 'clockwise', 'speed': 90})
+            binaryCode += binaryHandler.encodeBlock('c_end')
+            boolean = binaryHandler.encodeBoolean('b_distance',
+                                                  {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
+            binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
+            binaryCode += binaryHandler.encodeBlock('wait_seconds', {'seconds': 5})
             binaryCode += binaryHandler.encodeBlock('motors_stop', {'port': 'A'})
+            binaryCode += binaryHandler.encodeBlock('wait_until', {'boolean': boolean})
+            binaryCode += binaryHandler.encodeBlock('c_repeat', {'times': 7})
             binaryCode += binaryHandler.encodeBlock('set_status_light', {'color': 'RED'})
             binaryCode += binaryHandler.encodeBlock('c_end')
-
+            binaryCode += binaryHandler.encodeBlock('c_forever')
+            binaryCode += binaryHandler.encodeBlock('set_status_light', {'color': 'RED'})
+            binaryCode += binaryHandler.encodeBlock('c_end')
+            binaryCode += binaryHandler.encodeBlock('wait_touch', {'port': '1', 'state': 'pressed'})
         except TypeError:
             print("/!\\ Unable to correctly create binary chain")
             exit()
@@ -65,8 +69,13 @@ while 1:
         code = binaryHandler.parse(binaryCode)
 
         if code:
-            codeConverter.convert(code)
-            codeConverter.display()
+            if codeConverter.convert(code):
+                codeConverter.display()
+            else:
+                print("/!\\ Unable to convert code")
+        else:
+            print("/!\\ Unable to parse binary")
+
             # codeConverter.execute()
 
 exit()

@@ -22,14 +22,16 @@ class CodeConverter:
                 eval(function)
             except AttributeError:  # Implementation does not provide code for required function
                 self.impl.missingImplementationHandler(c['name'], args)
+                return None
             except TypeError as e:  # Incorrect arguments list passed to the implementation
                 print("/!\\ Error when converting {}, incorrect arguments for current implementation."
                       .format(c['name']))
                 print(e)
+                return None
             except Exception as e:  # Another error occurred
                 print("/!\\ Error when converting {}".format(c['name']))
                 print("{} {}".format(type(e), e))
-                exit()
+                return None
 
         return self.impl.getCode()
 

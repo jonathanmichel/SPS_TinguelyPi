@@ -37,6 +37,10 @@ lcd.update()
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
 
+    ###############################
+    # CodeImpl functions
+    ###############################
+
     def getCode(self):
         return self.code
 
@@ -49,8 +53,20 @@ lcd.update()
     def missingImplementationHandler(self, block, args):
         self.addLine("# /!\\ Missing implementation for {}".format(block))
 
+    ###############################
+    # C BLOCKS IMPLEMENTATIONS
+    ###############################
+
+    def c_end(self):
+        self.level -= 1
+
     def c_forever(self):
         self.addLine("while True:")
+        self.level += 1
+
+    def c_if(self, boolean):
+        super().boolean(self, boolean)
+        self.addLine("if booleanCheck:")
         self.level += 1
 
     def c_repeat(self, times):
@@ -63,33 +79,57 @@ lcd.update()
         self.level += 1
         super().boolean(self, boolean)
 
-    def c_if(self, boolean):
-        super().boolean(self, boolean)
-        self.addLine("if booleanCheck:")
-        self.level += 1
-
     def c_else(self):
         self.level -= 1
         self.addLine("else:")
         self.level += 1
 
-    def c_end(self):
-        self.level -= 1
+    ###############################
+    # H BLOCKS IMPLEMENTATIONS
+    ###############################
 
     def h_on_start(self):
         self.addLine("# [h_on_start]")
 
-    def wait_seconds(self, seconds):
-        self.addLine("sleep({})".format(seconds))
+    ###############################
+    # STACK BLOCKS IMPLEMENTATIONS
+    ###############################
 
-    def wait_until(self, boolean):
-        self.addLine("# /// wait_until \\\\\\")
-        self.addLine("booleanCheck = False")
-        self.addLine("while not booleanCheck:")
-        self.level += 1
-        super().boolean(self, boolean)
-        self.level -= 1
-        self.addLine("# \\\\\\ wait_until /// ")
+    def motors_run_direction(self, port, direction, unit, value):
+        sign = -1 if direction == 1 else 1
+
+        if self.checkMotorsPorts(port):
+            self.addLine("motor = Motor(address='{}')".format(port))
+            if unit == 'rotations':
+                self.addLine("motor.on_for_rotations(speed=50,rotations={})".format(value * sign))
+            elif unit == 'degrees':
+                self.addLine("motor.on_for_degrees(speed=50,degrees={})".format(value * sign))
+            elif unit == 'seconds':
+                self.addLine("motor.on_for_seconds(speed=50,seconds={})".format(value * sign))
+            else:
+                print("Incorrect unit")
+                exit()
+        else:
+            print("Incorrect port value")
+            exit()
+
+    def motors_start_speed(self, port, direction, speed):
+        sign = -1 if direction == 1 else 1
+
+        if self.checkMotorsPorts(port):
+            self.addLine("motor = Motor(address='{}')".format(port))
+            self.addLine("motor.on(speed={})".format(speed * sign))
+        else:
+            print("Incorrect port value for motors_start_speed")
+            exit()
+
+    def motors_stop(self, port):
+        if self.checkMotorsPorts(port):
+            self.addLine("motor = Motor(address='{}')".format(port))
+            self.addLine("motor.off()")
+        else:
+            print("Incorrect port value for motors_stop")
+            exit()
 
     def set_status_light(self, color):
         # Scratch colors enum : BLACK, GREEN, RED, ORANGE, GREEN_PULSE, RED_PULSE, ORANGE_PULSE
@@ -107,41 +147,17 @@ lcd.update()
             self.addLine("leds.animate_stop()")
             self.addLine("leds.all_off()")
 
-    def motors_run_direction(self, port, direction, unit, value):
-        sign = -1 if direction == 1 else 1
+    def wait_seconds(self, seconds):
+        self.addLine("sleep({})".format(seconds))
 
-        if self.checkSensorsPorts(port):
-            self.addLine("motor = Motor(address='{}')".format(self.motorsPorts[port]))
-            if unit == 'rotations':
-                self.addLine("motor.on_for_rotations(speed=50,rotations={})".format(value * sign))
-            elif unit == 'degrees':
-                self.addLine("motor.on_for_degrees(speed=50,degrees={})".format(value * sign))
-            elif unit == 'seconds':
-                self.addLine("motor.on_for_seconds(speed=50,seconds={})".format(value * sign))
-            else:
-                print("Incorrect unit")
-                exit()
-        else:
-            print("Incorrect port value")
-            exit()
-
-    def motors_start_speed(self, port, direction, value):
-        sign = -1 if direction == 1 else 1
-
-        if self.checkMotorsPorts(port):
-            self.addLine("motor = Motor(address='{}')".format(port))
-            self.addLine("motor.on(speed={})".format(value * sign))
-        else:
-            print("Incorrect port value for motors_start_speed")
-            exit()
-
-    def motors_stop(self, port):
-        if self.checkMotorsPorts(port):
-            self.addLine("motor = Motor(address='{}')".format(port))
-            self.addLine("motor.off()")
-        else:
-            print("Incorrect port value for motors_stop")
-            exit()
+    def wait_until(self, boolean):
+        self.addLine("# /// wait_until \\\\\\")
+        self.addLine("booleanCheck = False")
+        self.addLine("while not booleanCheck:")
+        self.level += 1
+        super().boolean(self, boolean)
+        self.level -= 1
+        self.addLine("# \\\\\\ wait_until /// ")
 
     def wait_touch(self, port, state):
         if self.checkSensorsPorts(port):
@@ -157,6 +173,10 @@ lcd.update()
             print("Incorrect port value for wait_touch")
             exit()
 
+    ###############################
+    # BOOLEAN IMPLEMENTATIONS
+    ###############################
+
     def b_touch(self, port):
         if self.checkSensorsPorts(port):
             self.addLine("# <b_touch {}>".format(port))
@@ -167,5 +187,4 @@ lcd.update()
         if self.checkSensorsPorts(port):
             self.addLine("# b_distance {} {} {} {}".format(port, operator, value, unit))
             self.addLine("distance = UltrasonicSensor({})".format(port))
-            self.addLine("booleanCheck = False") # @todo Implement
-
+            self.addLine("booleanCheck = False")  # @todo Implement

@@ -1,6 +1,27 @@
+"""
+ ____________
+/            \--------------------------
+| when program starts                  |
+|---    --------------------------------
+|   \__/                               |
+| forever                              |
+|   |---    --------------------------------
+|   |   \__/                               |
+|   | wait (13) seconds                    |
+|   |---    --------------------------------
+|   |   \__/                               |
+|   | set status light to [GREEN]          |
+|   ----    ----------------------------
+|       \__/                           |
+|                                    ^ |
+|___    ________________________________
+    \__/
+
+"""
+
 class AsciiDrawer:
     def __init__(self, codeImpl):
-        self.blockLength = 55
+        self.blockLength = 60
         self.levelShiftSize = 4
         self.notchSize = 4
         self.concatenateBlocks = True
