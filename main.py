@@ -6,7 +6,7 @@ from FileHandler import FileHandler
 from CodeImplementations.Ev3DevCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
-# from UartCom import UartCom
+from UartCom import UartCom
 
 
 # Load xmlParser
