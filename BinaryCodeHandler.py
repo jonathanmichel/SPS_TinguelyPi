@@ -278,7 +278,7 @@ class BinaryCodeParser:
     def encodeBoolean(self, booleanName, argsList=None):
         binary = self.encode("booleans", booleanName, argsList)
 
-        if bin:
+        if binary:
             # Booleans are preceded by one byte that indicates boolean binary size in bytes
             bits_length = len(binary)
             bytes_length = ceil(bits_length / 8)
