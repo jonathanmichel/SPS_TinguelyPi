@@ -4,7 +4,8 @@ from util import *
 
 class CodeImpl(metaclass=abc.ABCMeta):
     def __init__(self):
-        self.name = 'CodeImpl'
+        self.code = ''
+        self.level = 0
 
     # @todo booleanCheck variable used as flag for boolean verification should have a unique identifier to avoid
     # issue when conditions are nested. This one should be handled in the global CodeImpl class
@@ -35,13 +36,11 @@ class CodeImpl(metaclass=abc.ABCMeta):
     # CodeImpl functions
     ###############################
 
-    @abc.abstractmethod
     def getCode(self):
-        pass
+        return self.code
 
-    @abc.abstractmethod
     def display(self):
-        pass
+        print(self.code)
 
     @abc.abstractmethod
     def execute(self):

@@ -4,8 +4,6 @@ from CodeImplementations.CodeImpl import CodeImpl
 class Ev3DevCodeImpl(CodeImpl):
     def __init__(self):
         super().__init__()
-        self.code = ''
-        self.level = 0
         self.file_header = """
 # !/usr/bin/env python3
 from time import time, sleep
@@ -40,12 +38,6 @@ lcd.update()
     ###############################
     # CodeImpl functions
     ###############################
-
-    def getCode(self):
-        return self.code
-
-    def display(self):
-        print(self.code)
 
     def execute(self):
         print("No execution for Ev3DevCodeImpl")

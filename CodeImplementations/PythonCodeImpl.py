@@ -5,8 +5,6 @@ from CodeImplementations.CodeImpl import CodeImpl
 class PythonCodeImpl(CodeImpl):
     def __init__(self):
         super().__init__()
-        self.code = ''
-        self.level = 0
 
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
@@ -18,12 +16,6 @@ class PythonCodeImpl(CodeImpl):
     ###############################
     # CodeImpl functions
     ###############################
-
-    def getCode(self):
-        return self.code
-
-    def display(self):
-        print(self.code)
 
     def execute(self):
         print("Executing code ...")
