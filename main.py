@@ -26,13 +26,11 @@ while 1:
     if frame:
         binaryCode = binaryHandler.convertIntArrayToBinaryChain(frame)
 
-        """
         # Append h_on_start event to code read from arduino, for debug purpose
-        binaryCode =    binaryHandler.encodeBlock('h_on_start') + \
-                        binaryHandler.encodeBlock('c_forever') + \
-                        binaryCode + \
-                        binaryHandler.encodeBlock('c_end')
-        """
+        binaryCode = binaryHandler.encodeBlock('h_on_start') + \
+                     binaryHandler.encodeBlock('c_forever') + \
+                     binaryCode + \
+                     binaryHandler.encodeBlock('c_end')
 
         """
         #  Software generated binary code
@@ -49,7 +47,8 @@ while 1:
                                                     {'port': 'A', 'direction': 'clockwise', 'speed': 90})
             binaryCode += binaryHandler.encodeBlock('c_end')
             boolean = binaryHandler.encodeBoolean('b_distance',
-                                                  {'port': '2', 'operator': 'less', 'value': 50, 'unit': 'inches'})
+                                                  {'port': '4', 'operator': 'less',
+                                                   'sign': 'positive', 'value': 15, 'unit': 'cm'})
             binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
             binaryCode += binaryHandler.encodeBlock('wait_seconds', {'seconds': 5})
             binaryCode += binaryHandler.encodeBlock('motors_stop', {'port': 'A'})
