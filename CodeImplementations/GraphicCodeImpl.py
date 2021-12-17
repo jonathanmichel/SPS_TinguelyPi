@@ -107,3 +107,9 @@ class GraphicCodeImpl(CodeImpl):
         if sign == 'negative':
             value *= -1
         return "({}) is distance [{}] ({}) [{}]".format(port, operator, value, unit)
+
+    def set_trap_door(self, state):
+        self.asciiDrawer.drawStackBlock("({}) trap door".format(state))
+
+    def start_crawler(self, direction):
+        self.asciiDrawer.drawStackBlock("start crawler ({})".format(direction))

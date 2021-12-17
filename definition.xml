@@ -149,6 +149,28 @@
                 <boolean type="binary"/>
             </arguments>
         </block>
+        <block name="set_trap_door">
+            <id>0x64</id>   <!-- 100 -->
+            <type>stack</type>
+            <family>custom</family>
+            <arguments>
+                <state size="1" type="enum">
+                    <enum value="0">close</enum>
+                    <enum value="1">open</enum>
+                </state>
+            </arguments>
+        </block>
+        <block name="start_crawler">
+            <id>0x65</id>
+            <type>stack</type>
+            <family>custom</family>
+            <arguments>
+                <direction size="1" type="enum">
+                    <enum value="0">right</enum>
+                    <enum value="1">left</enum>
+                </direction>
+            </arguments>
+        </block>
         <block name="c_else">
             <id>0x7F</id>
             <type>c</type>

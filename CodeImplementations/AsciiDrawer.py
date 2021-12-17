@@ -19,6 +19,7 @@
 
 """
 
+
 class AsciiDrawer:
     def __init__(self, codeImpl):
         self.blockLength = 60

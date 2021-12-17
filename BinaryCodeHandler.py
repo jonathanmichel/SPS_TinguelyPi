@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from math import *
 
+
 class BinaryCodeParser:
     def __init__(self, path):
         self.path = path

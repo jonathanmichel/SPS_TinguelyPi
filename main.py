@@ -28,9 +28,9 @@ while 1:
 
         # Append h_on_start event to code read from arduino, for debug purpose
         binaryCode = binaryHandler.encodeBlock('h_on_start') + \
-                     binaryHandler.encodeBlock('c_forever') + \
-                     binaryCode + \
-                     binaryHandler.encodeBlock('c_end')
+                     binaryCode
+                     # binaryHandler.encodeBlock('c_end')
+                     # binaryHandler.encodeBlock('c_forever') + \
 
         """
         #  Software generated binary code
