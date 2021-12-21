@@ -8,23 +8,14 @@ class Ev3DevCodeImpl(CodeImpl):
 # !/usr/bin/env python3
 from time import time, sleep
 
-from PIL import Image
-
-from ev3dev2.display import Display
 from ev3dev2.led import Leds
 from ev3dev2.motor import Motor
 from ev3dev2.sensor.lego import TouchSensor, UltrasonicSensor
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4 
 
-lcd = Display()
-
 leds = Leds()
 
 leds.all_off()
-
-logo = Image.open('/home/robot/pics/EV3.bmp')
-lcd.image.paste(logo, (0,0))
-lcd.update()
 """
         self.code += self.file_header
 
@@ -183,3 +174,31 @@ lcd.update()
             self.addLine("# b_distance {} {} {} {}".format(port, operator, sign, value, unit))
             self.addLine("distance = UltrasonicSensor({})".format(port))
             self.addLine("booleanCheck = False")  # @todo Implement
+
+    ###############################
+    # CUSTOM IMPLEMENTATIONS
+    ###############################
+
+    def set_trap_door(self, state):
+        speed = 50
+        address = 'A'
+        if state == 'open':
+            self.addLine("motor = Motor(address='{}')".format(address))
+            self.addLine("motor.on_for_degrees(speed={},degrees=360)".format(speed))
+        elif state == 'close':
+            self.addLine("motor = Motor(address='{}')".format(address))
+            self.addLine("motor.on_for_degrees(speed={},degrees=-360)".format(speed))
+        else:
+            print("Incorrect state value")
+            exit()
+
+    def start_crawler(self, direction):
+        sign = -1 if direction == 'counterclockwise' else 1
+        speed = 20
+        address = 'B'
+
+        self.addLine("motor = Motor(address='{}')".format(address))
+        self.addLine("motor.on(speed={})".format(speed * sign))
+
+        self.wait_seconds(5)
+        self.motors_stop('B')

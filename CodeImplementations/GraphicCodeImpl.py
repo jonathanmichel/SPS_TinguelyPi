@@ -108,6 +108,10 @@ class GraphicCodeImpl(CodeImpl):
             value *= -1
         return "({}) is distance [{}] ({}) [{}]".format(port, operator, value, unit)
 
+    ###############################
+    # CUSTOM IMPLEMENTATIONS
+    ###############################
+
     def set_trap_door(self, state):
         self.asciiDrawer.drawStackBlock("({}) trap door".format(state))
 
