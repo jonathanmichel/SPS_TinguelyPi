@@ -13,7 +13,7 @@ binaryHandler = BinaryCodeParser('definition.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-impl = GraphicCodeImpl()
+impl = Ev3DevCodeImpl()
 codeConverter = CodeConverter(impl)
 
 # Initialize uart communication to read encoded code
@@ -65,33 +65,32 @@ while 1:
             exit()
         """
 
-        code = binaryHandler.parse(binaryCode)
+        code_array = binaryHandler.parse(binaryCode)
 
-        if code:
-            if codeConverter.convert(code):
+        if code_array:
+            converted_code = codeConverter.convert(code_array)
+            if converted_code:
                 codeConverter.display()
+
+                file = FileHandler('config.ini')
+                ssh = SshHandler('config.ini')
+
+                file.write(converted_code)
+                ssh.sendFile()
+
+                ssh.executeCode()
+
+                try:
+                    while True:
+                        pass
+                except KeyboardInterrupt:
+                    ssh.stopCode()
+                    ssh.close()
+                    exit()
+
             else:
-                print("/!\\ Unable to convert code")
+                codeConverter.display()
+                print("/!\\ Error when converting code - Function implementations missing")
+
         else:
             print("/!\\ Unable to parse binary")
-
-            # codeConverter.execute()
-
-exit()
-
-file = FileHandler('config.ini')
-ssh = SshHandler('config.ini')
-
-file.write(code)
-ssh.sendFile()
-
-exit()
-
-ssh.executeCode()
-
-try:
-    while True:
-        pass
-except KeyboardInterrupt:
-    ssh.stopCode()
-    ssh.close()
