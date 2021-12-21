@@ -91,7 +91,7 @@ lcd.update()
     ###############################
 
     def motors_run_direction(self, port, direction, unit, value):
-        sign = -1 if direction == 1 else 1
+        sign = -1 if direction == 'counterclockwise' else 1
 
         if self.checkMotorsPorts(port):
             self.addLine("motor = Motor(address='{}')".format(port))
@@ -109,7 +109,7 @@ lcd.update()
             exit()
 
     def motors_start_speed(self, port, direction, speed):
-        sign = -1 if direction == 1 else 1
+        sign = -1 if direction == 'counterclockwise' else 1
 
         if self.checkMotorsPorts(port):
             self.addLine("motor = Motor(address='{}')".format(port))
