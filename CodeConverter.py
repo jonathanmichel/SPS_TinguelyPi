@@ -12,31 +12,36 @@ class CodeConverter:
 
     # Convert code provided as array
     def convert(self, code):
+        error = False
         self.impl.clearCode()
         for c in code:
             args = convertArgumentArrayToList(c['args'])
 
             try:
+                self.impl.debugLine(c['name'], args)
                 function = 'self.impl.' + c['name'] + '(' + args + ')'
                 # print(function)
                 eval(function)
             except AttributeError:  # Implementation does not provide code for required function
                 self.impl.missingImplementationHandler(c['name'], args)
-                return None
+                error = True
             except TypeError as e:  # Incorrect arguments list passed to the implementation
                 print("/!\\ Error when converting {}, incorrect arguments for current implementation."
                       .format(c['name']))
                 print(e)
-                return None
+                error = True
             except Exception as e:  # Another error occurred
                 print("/!\\ Error when converting {}".format(c['name']))
                 print("{} {}".format(type(e), e))
-                return None
+                error = True
+
+        if error:
+            return None
 
         return self.impl.getCode()
 
     def getCode(self):
-        self.impl.getCode()
+        return self.impl.getCode()
 
     def display(self):
         print("=" * 15)

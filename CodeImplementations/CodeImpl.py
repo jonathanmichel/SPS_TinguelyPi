@@ -50,6 +50,9 @@ class CodeImpl(metaclass=abc.ABCMeta):
     def missingImplementationHandler(self, block, args):
         pass
 
+    def debugLine(self, function, arg):
+        pass
+
     ###############################
     # C BLOCKS IMPLEMENTATIONS
     ###############################

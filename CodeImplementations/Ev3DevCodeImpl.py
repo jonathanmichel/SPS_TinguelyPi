@@ -35,6 +35,9 @@ lcd.update()
     def addLine(self, line):
         self.code += "{}{}\n".format(("\t" * self.level), line)
 
+    def debugLine(self, function, args):
+        self.addLine('# === ' + function + '(' + args + ')' + '===')
+
     ###############################
     # CodeImpl functions
     ###############################
