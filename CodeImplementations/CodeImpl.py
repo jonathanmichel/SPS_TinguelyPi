@@ -130,5 +130,5 @@ class CodeImpl(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def b_distance(self, port, operator, sign, value, unit):
+    def b_distance(self, port, operator, value, unit):
         pass

@@ -3,7 +3,7 @@ from BinaryCodeHandler import BinaryCodeParser
 from CodeConverter import CodeConverter
 from SshHandler import SshHandler
 from FileHandler import FileHandler
-from CodeImplementations.Ev3DevCodeImpl import *
+from CodeImplementations.Ev3DevPythonCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
 from UartCom import UartCom
@@ -48,7 +48,7 @@ while 1:
             binaryCode += binaryHandler.encodeBlock('c_end')
             boolean = binaryHandler.encodeBoolean('b_distance',
                                                   {'port': '4', 'operator': 'less',
-                                                   'sign': 'positive', 'value': 15, 'unit': 'cm'})
+                                                   'value': 15, 'unit': 'cm'})
             binaryCode += binaryHandler.encodeBlock('c_repeat_until', {'boolean': boolean})
             binaryCode += binaryHandler.encodeBlock('wait_seconds', {'seconds': 5})
             binaryCode += binaryHandler.encodeBlock('motors_stop', {'port': 'A'})

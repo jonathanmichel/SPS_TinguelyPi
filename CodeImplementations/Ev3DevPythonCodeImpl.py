@@ -1,7 +1,7 @@
 from CodeImplementations.CodeImpl import CodeImpl
 
 
-class Ev3DevCodeImpl(CodeImpl):
+class Ev3DevPythonCodeImpl(CodeImpl):
     def __init__(self):
         super().__init__()
         self.file_header = """
@@ -83,15 +83,16 @@ leds.all_off()
 
     def motors_run_direction(self, port, direction, unit, value):
         sign = -1 if direction == 'counterclockwise' else 1
+        speed = 50
 
         if self.checkMotorsPorts(port):
             self.addLine("motor = Motor(address='{}')".format(port))
             if unit == 'rotations':
-                self.addLine("motor.on_for_rotations(speed=50,rotations={})".format(value * sign))
+                self.addLine("motor.on_for_rotations(speed={},rotations={})".format(speed * sign, value))
             elif unit == 'degrees':
-                self.addLine("motor.on_for_degrees(speed=50,degrees={})".format(value * sign))
+                self.addLine("motor.on_for_degrees(speed={},degrees={})".format(speed * sign, value))
             elif unit == 'seconds':
-                self.addLine("motor.on_for_seconds(speed=50,seconds={})".format(value * sign))
+                self.addLine("motor.on_for_seconds(speed={},seconds={})".format(speed * sign, value))
             else:
                 print("Incorrect unit")
                 exit()
@@ -169,10 +170,9 @@ leds.all_off()
             self.addLine("touch = TouchSensor({})".format(port))
             self.addLine("booleanCheck = touch.is_pressed")
 
-    def b_distance(self, port, operator, sign, value, unit):
+    def b_distance(self, port, operator, value, unit):
         if self.checkSensorsPorts(port):
-            self.addLine("# b_distance {} {} {} {}".format(port, operator, sign, value, unit))
-            self.addLine("distance = UltrasonicSensor({})".format(port))
+            self.addLine("# b_distance {} {} {} {}".format(port, operator, value, unit))
             self.addLine("booleanCheck = False")  # @todo Implement
 
     ###############################

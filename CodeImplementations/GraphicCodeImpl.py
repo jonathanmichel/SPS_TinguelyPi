@@ -103,9 +103,7 @@ class GraphicCodeImpl(CodeImpl):
     def b_touch(self, port):
         return "({}) is pressed ?".format(port)
 
-    def b_distance(self, port, operator, sign, value, unit):
-        if sign == 'negative':
-            value *= -1
+    def b_distance(self, port, operator, value, unit):
         return "({}) is distance [{}] ({}) [{}]".format(port, operator, value, unit)
 
     ###############################

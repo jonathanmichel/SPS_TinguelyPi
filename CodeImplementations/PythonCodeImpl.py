@@ -104,5 +104,5 @@ class PythonCodeImpl(CodeImpl):
     def b_touch(self, port):
         self.addLine("booleanCheck = False # b_touch {}".format(port))
 
-    def b_distance(self, port, operator, sign, value, unit):
-        self.addLine("booleanCheck = False # b_distance {} {} {} {} {}".format(port, operator, sign, value, unit))
+    def b_distance(self, port, operator, value, unit):
+        self.addLine("booleanCheck = False # b_distance {} {} {} {}".format(port, operator, value, unit))
