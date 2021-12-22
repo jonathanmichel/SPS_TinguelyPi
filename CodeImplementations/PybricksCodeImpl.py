@@ -207,9 +207,9 @@ ev3 = EV3Brick()
     def set_trap_door(self, state):
         port = 'A'
         if state == 'open':
-            self.motors_run_direction(port=port, direction="clockwise", unit="rotations", value=-360)
+            self.motors_run_direction(port=port, direction="clockwise", unit="degrees", value=-360)
         elif state == 'close':
-            self.motors_run_direction(port=port, direction="clockwise", unit="rotations", value=360)
+            self.motors_run_direction(port=port, direction="clockwise", unit="degrees", value=360)
         else:
             print("Incorrect state value")
             exit()
@@ -218,4 +218,4 @@ ev3 = EV3Brick()
         port = 'B'
 
         # self.motors_start_speed(port=port, direction="clockwise", 500)
-        self.motors_run_direction(port=port, direction=direction, unit="seconds", value=5)
+        self.motors_run_direction(port=port, direction=direction, unit="seconds", value=3)
