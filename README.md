@@ -4,9 +4,9 @@
 
 The **Tinguely EV3** project aims to provide a tangible interface that allows user to program EV3 devices with [Scratch blocks](https://scratch.mit.edu/ev3) in real life. It replaces [EV3 Classroom](https://education.lego.com/en-us/downloads/mindstorms-ev3/software#downloads) for educational purposes by empowering collaboration and learning by giving physical forms to digital information, thus taking advantage of the human ability to grasp and manipulate physical objects and materials. 
 
-Blocks communicate each others on a serial line with magnetics connector in their notches. Each Scratch block (function) has an unique ID and a pre-defined list of parameters. The lowest block sends its ID and parameters as a binary chain to the upper block. The later sends its ID and parameters with the data received from above. The uppermost block receives the full binary chain that represents the Scratch program and send it to a Raspberry Pi for decoding and generation of a Python code that can be run on EV3 devices.   
+Blocks communicate each others on a serial line with magnetics connector in their notches. Each Scratch block (function) has an unique ID and a pre-defined list of parameters. The lowest block sends its ID and parameters as a binary chain to the upper block. The later sends its ID and parameters with the data received from above. The uppermost block receives the full binary chain that represents the Scratch program and send it to a Raspberry Pi for decoding and generation of a MicroPython code that can be run on EV3 devices.   
 
-**This repository contains the code that has to run on the Raspberry Pi**. It collects the binary chain transmitted through the blocks and convert it in a Python code that uses the [ev3dev2](https://pypi.org/project/python-ev3dev2/) library. It can also generate a visual representation of the code in ASCII.   
+**This repository contains the code that has to run on the Raspberry Pi**. It collects the binary chain transmitted through the blocks and convert it in a MicroPython code that uses the [pybricks](https://pybricks.com/ev3-micropython/index.html) library. It can also generate a visual representation of the code in ASCII.   
 
 
 
@@ -17,7 +17,7 @@ See [requirements.txt](requirements.txt)
 
 Supported Scratch blocks are listed in [definition.xml](definition.xml). Each block has an unique ID and a pre-defined list of parameters.
 
-For each block, an implementation has to be provided as described in [CodeImpl.py](CodeImplementations/CodeImpl.py). Currently, three implementations exist.   
+For each block, an implementation has to be provided as described in [CodeImpl.py](CodeImplementations/CodeImpl.py). Currently, four implementations exist.   
 
 - [GraphicCodeImpl](CodeImplementations/GraphicCodeImpl.py): Provides an ASCII visualisation of the code. Block drawing is handled by [AsciiDrawer.py](CodeImplementations/AsciiDrawer.py).
 
@@ -40,7 +40,27 @@ For each block, an implementation has to be provided as described in [CodeImpl.p
 |___    ____________________________________________________
     \__/
 ```
-- [Ev3DevCodeImpl](CodeImplementations/Ev3DevCodeImpl.py): Provides a Python implementation that uses the [ev3dev2](https://pypi.org/project/python-ev3dev2/) library to programm EV3 devices in Python.
+- [PybricksCodeImpl](CodeImplementations/PybricksCodeImpl.py): Provides an implementation that uses the [pybricks](https://pybricks.com/ev3-micropython/index.html) library to program EV3 devices in MicroPython.
+
+```
+#!/usr/bin/env pybricks-micropython
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import Motor, TouchSensor, UltrasonicSensor, ColorSensor
+from pybricks.parameters import *
+from pybricks.tools import *
+
+# Initialize the EV3 Brick.
+ev3 = EV3Brick()
+
+touch = TouchSensor(Port.S1)
+booleanCheck = touch.pressed()
+if booleanCheck:
+    wait(5000)
+    ev3.light.on(Color.RED)
+
+```
+
+- [Ev3DevPyhtonCodeImpl](CodeImplementations/Ev3DevPythonCodeImpl.py): Provides a implementation that uses the [ev3dev2](https://pypi.org/project/python-ev3dev2/) library to program EV3 devices in Python. **This implementation is deprecated because the library is to slow to import.** 
 
 ```python
 # !/usr/bin/env python3
@@ -68,8 +88,8 @@ lcd.update()
 touch = TouchSensor(1)
 booleanCheck = touch.is_pressed
 if booleanCheck:
-	sleep(5)
-	leds.set_color('LEFT', 'RED')
+    sleep(5)
+    leds.set_color('LEFT', 'RED')
 	leds.set_color('RIGHT', 'RED')
 ```
 
@@ -77,10 +97,9 @@ if booleanCheck:
 
 ```python
 # [h_on_start]
-# /// c_if \\\
+# <b_touch 1>
 booleanCheck = False # b_touch 1
-if booleanCheck:
-# \\\ c_if /// 
+if booleanCheck: 
 	time.sleep(5)
 	print('Set color to RED')
 ```

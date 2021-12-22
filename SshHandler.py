@@ -24,12 +24,12 @@ class SshHandler:
             scp.put(self.main_file_name, self.ev3_deployment_path + self.main_file_name)
 
         print('File ' + self.main_file_name + ' sent to ' +
-              self.ev3_username + '@' + self.ev3_ip + ':' + self.ev3_deployment_path)
+              self.ev3_username + '@' + self.ev3_ip + ':' + self.ev3_deployment_path + self.main_file_name)
 
     def executeCode(self):
         path = self.ev3_deployment_path + self.main_file_name
         print('Executing ' + self.ev3_ip + ':' + path)
-        self.sshClient.exec_command('python3 ' + path)
+        self.sshClient.exec_command('brickrun ' + path)
 
     def stopCode(self):
         stdin, stdout, stderr = self.sshClient.exec_command(self.ev3_deployment_path + 'kill.sh')

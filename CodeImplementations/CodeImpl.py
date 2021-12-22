@@ -32,6 +32,18 @@ class CodeImpl(metaclass=abc.ABCMeta):
             return True
         return False
 
+    @staticmethod
+    def convertOperator(stringValue):
+        supported_operators = {
+            "equal": "=",
+            "greater": ">",
+            "less": "<"
+        }
+
+        if stringValue in supported_operators.keys():
+            return supported_operators[stringValue]
+        return None
+
     ###############################
     # CodeImpl functions
     ###############################

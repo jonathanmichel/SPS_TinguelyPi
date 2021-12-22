@@ -25,9 +25,9 @@
                     <enum value="1">counterclockwise</enum> <!-- left -->
                 </direction>
                 <unit size="2" type="enum">
-                    <enum value="0">rotations</enum>
-                    <enum value="1">degrees</enum>
-                    <enum value="2">seconds</enum>
+                    <enum value="0">rotations</enum>    <!-- rot -->
+                    <enum value="1">degrees</enum>      <!-- deg -->
+                    <enum value="2">seconds</enum>      <!-- sec -->
                 </unit>
                 <value size="8" type="uint"/>  <!-- 0 ... 255 -->
             </arguments>
@@ -47,7 +47,7 @@
                     <enum value="0">clockwise</enum> <!-- right -->
                     <enum value="1">counterclockwise</enum> <!-- left -->
                 </direction>
-                <!-- 0 ... 100 -->
+                <!-- 0 ... 100 % -->
                 <speed size="7" type="uint"/>
             </arguments>
         </block>

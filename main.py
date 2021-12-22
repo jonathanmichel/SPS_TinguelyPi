@@ -6,14 +6,15 @@ from FileHandler import FileHandler
 from CodeImplementations.Ev3DevPythonCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
+from CodeImplementations.PybricksCodeImpl import *
 from UartCom import UartCom
 
 # Load xmlParser
 binaryHandler = BinaryCodeParser('definition.xml')
 
 # Chose here which code implementation you want
-# GraphicCodeImpl PythonCodeImpl Ev3DevCodeImpl
-impl = Ev3DevCodeImpl()
+# GraphicCodeImpl PythonCodeImpl Ev3DevPythonCodeImpl PybricksCodeImpl
+impl = PybricksCodeImpl()
 codeConverter = CodeConverter(impl)
 
 # Initialize uart communication to read encoded code
