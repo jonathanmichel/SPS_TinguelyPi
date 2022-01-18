@@ -25,29 +25,32 @@ codeConverterGraphic = CodeConverter(graphicCodeImpl)
 uartCom = UartCom()
 gpio = Gpio()
 
+# Crate handler for file writting and
+# ssh communication with the EV3
 file = FileHandler('config.ini')
 ssh = SshHandler('config.ini')
 
 
+# Remotely stop code and close ssh session
 def endAll():
     ssh.stopCode()
     ssh.close()
     exit()
 
+
 try:
     while True:
+        # Read full frame received from UART
         frame = uartCom.readRx()
         if frame:
+            # Convert frame array to str binary chain
             binaryCode = binaryHandler.convertIntArrayToBinaryChain(frame)
 
-            # Append h_on_start event to code read from arduino, for debug purpose
-            binaryCode = binaryHandler.encodeBlock('h_on_start') + \
-                         binaryCode
-                         # binaryHandler.encodeBlock('c_end')
-                         # binaryHandler.encodeBlock('c_forever') + \
+            # Append h_on_start at the beginning of the code read from Arduino
+            binaryCode = binaryHandler.encodeBlock('h_on_start') + binaryCode
 
             """
-            #  Software generated binary code
+            #  Software generated binary code (debug)
             try:
                 binaryCode = ''
                 binaryCode += binaryHandler.encodeBlock('h_on_start')
@@ -69,22 +72,29 @@ try:
                 exit()
             """
 
+            # Generate code array from binary chain
             code_array = binaryHandler.parse(binaryCode)
 
             if code_array:
+                # Convert code array in a graphical representation for debug purposes
                 converted_code = codeConverterGraphic.convert(code_array)
                 if converted_code:
+                    # Display graphical representation
                     codeConverterGraphic.display()
 
+                    # Check if user wants to "upload" the current code to the EV3
+                    # @todo Replace by asynchron call
                     if gpio.isKeyPressed():
                         print(10 * "PROGRAM ")
 
                         codeConverterPybricks = CodeConverter(PybricksCodeImpl())
                         if codeConverterPybricks.convert(code_array):
-                            file.write(codeConverterPybricks.getCode())
-                            ssh.sendFile()
+                            codeConverterPybricks.display()
+                            
+                            # file.write(codeConverterPybricks.getCode())
+                            # ssh.sendFile()
 
-                            ssh.executeCode()
+                            # ssh.executeCode()
                         else:
                             print("Error when converting code for Pybricks")
 
@@ -93,10 +103,8 @@ try:
 
                         print(10 * "RESTART ")
 
-                        ssh.stopCode()
 
                     continue
-
                 else:
                     codeConverterGraphic.display()
                     print("/!\\ Error when converting code - Function implementations missing")
@@ -105,4 +113,5 @@ try:
                 print("/!\\ Unable to parse binary")
 
 except KeyboardInterrupt:
+    # Catch keyboard interrupt and close program
     endAll()

@@ -1,3 +1,15 @@
+"""
+Author: Jonathan Michel
+Date:   22.12.2021
+This class decodes a string that represents the binary chain received from the Arduino blocks.
+This chain allows to encode a Scratch program in binary, each block having an unique ID and a pre-defined
+list of parameters.
+The protocol is specified in an XML file that has to be passed to the constructor, see the documentation for
+additional information.
+It also provides encoding functions to append binary data to an existing chain. It allows to emulate the blocks
+behaviour.
+"""
+
 import xml.etree.ElementTree as ET
 from math import *
 

@@ -1,3 +1,10 @@
+"""
+Author: Jonathan Michel
+Date:   22.12.2021
+This class writes the file that contains the code to send to the EV3.
+The file name is specified in a ini config file
+"""
+
 import configparser
 
 

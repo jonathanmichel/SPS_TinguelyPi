@@ -1,8 +1,16 @@
+"""
+Author: Jonathan Michel
+Date:   22.12.2021
+This class provides an interface for the "programming" button that is used to
+launch the code on the EV3
+It reads input 8 state (see LAUNCH_GPIO)
+"""
+
 import RPi.GPIO as GPIO
 import time
 
-class Gpio:
 
+class Gpio:
     def __init__(self):
         self.LAUNCH_GPIO = 8
 
@@ -26,6 +34,6 @@ class Gpio:
         while GPIO.input(self.LAUNCH_GPIO) == GPIO.LOW:
             pass
 
-        time.sleep(0.02) # avoid bounces
+        time.sleep(0.02)    # avoid bounces
 
         self.waitReleased()

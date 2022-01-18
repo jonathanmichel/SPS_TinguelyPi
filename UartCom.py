@@ -1,3 +1,11 @@
+"""
+Author: Jonathan Michel
+Date:   22.12.2021
+This class reads the UART port to receive a frame from the Arduino of the upper block
+The frame has to follow a specific protocol. For additional information, see the
+documentation.
+"""
+
 import serial
 
 

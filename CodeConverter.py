@@ -1,3 +1,10 @@
+"""
+Author: Jonathan Michel
+Date:   22.12.2021
+This class translates an array of functions that represent a Scratch program in a precise language.
+A class implementing the CodeImpl interface has to be specified to
+"""
+
 from CodeImplementations.CodeImpl import CodeImpl
 from util import *
 
