@@ -105,7 +105,6 @@ try:
 
                         print(10 * "RESTART ")
 
-
                     continue
                 else:
                     codeConverterGraphic.display()

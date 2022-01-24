@@ -21,7 +21,7 @@ class SshHandler:
         try:
             self.sshClient.connect(self.ev3_ip, port=22, username=self.ev3_username, timeout=2)
         except socket.timeout as se:
-            print(se)
+            print("\tUnable to connect to the EV3 by SHH")
             return
 
         print("\tSSH connection to EV3 successful")

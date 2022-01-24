@@ -12,8 +12,10 @@ import time
 
 class Gpio:
     def __init__(self):
-        self.LAUNCH_GPIO = 8
+        self.LAUNCH_GPIO = 8    # physical pin 8
+        self.callback_function = None
 
+        # Uses physical pin numbers on the GPIO connector
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.LAUNCH_GPIO, GPIO.IN)
 
@@ -21,6 +23,9 @@ class Gpio:
         if GPIO.input(self.LAUNCH_GPIO):
             return True
         return False
+
+    def configureCallback(self, callback_function):
+        GPIO.add_event_detect(self.LAUNCH_GPIO, GPIO.RISING, callback=callback_function)
 
     def waitReleased(self):
         while GPIO.input(self.LAUNCH_GPIO) == GPIO.HIGH:
