@@ -14,6 +14,8 @@ class UartCom:
         self.binaryCtn = 0
         self.rxBuffer = []
 
+        print("Initialise serial communication on port {} at {} bauds".format(port, baudrate))
+
         self.serial = serial.Serial(
             port=port,
             baudrate=baudrate,
@@ -22,6 +24,8 @@ class UartCom:
             bytesize=serial.EIGHTBITS,
             timeout=1
         )
+
+        print("\t Serial communication initialised")
 
         self.START_HEAD = 0x1
         self.END_TRANSMISSION = 0x4

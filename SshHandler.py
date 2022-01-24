@@ -1,7 +1,7 @@
 import configparser
-from paramiko import SSHClient, AutoAddPolicy
+from paramiko import SSHClient, AutoAddPolicy, SSHException
 from scp import SCPClient
-
+import socket
 
 class SshHandler:
     def __init__(self, configFile):
@@ -17,7 +17,14 @@ class SshHandler:
         self.sshClient.set_missing_host_key_policy(AutoAddPolicy())
         # Password less connection. Rsa public key from host (Pi) has to be added to
         # target (EV3) ssh folder : /home/[user]/.ssh/known_host
-        self.sshClient.connect(self.ev3_ip, port=22, username=self.ev3_username)
+        print("Try to connect to the EV3 by SSH: {}@{} ...".format(self.ev3_username, self.ev3_ip))
+        try:
+            self.sshClient.connect(self.ev3_ip, port=22, username=self.ev3_username, timeout=2)
+        except socket.timeout as se:
+            print(se)
+            return
+
+        print("\tSSH connection to EV3 successful")
 
     def sendFile(self):
         with SCPClient(self.sshClient.get_transport()) as scp:

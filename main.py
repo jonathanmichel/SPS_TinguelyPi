@@ -38,6 +38,8 @@ def endAll():
     exit()
 
 
+print("Waiting for code ...")
+
 try:
     while True:
         # Read full frame received from UART
