@@ -11,7 +11,7 @@ import serial
 
 class UartCom:
     def __init__(self, port='/dev/ttyUSB0', baudrate=9600):
-        self.binaryCtn = 0
+        self.readingFrame = False
         self.rxBuffer = []
 
         print("Initialise serial communication on port {} at {} bauds".format(port, baudrate))
@@ -27,47 +27,29 @@ class UartCom:
 
         print("\t Serial communication initialised")
 
-        self.START_HEAD = 0x1
-        self.END_TRANSMISSION = 0x4
+        self.START_SYMBOL = '#'
+        self.END_SYMBOL = '!'
 
     def readRx(self):
-        data_byte = self.serial.read(1)
+        data = self.serial.read(1)
         # We check that a new byte has been read
-        if len(data_byte) > 0:
-            data = int.from_bytes(data_byte, "big")
-            # If binaryCtn is not 0, we are currently receiving data ...
-            # print("rx: {} \t ({}, {})".format(data_byte, data, hex(data)))
-
-            if self.binaryCtn > 0:
-                # ... so we fill the array
-                self.rxBuffer.append(data)
-                # .. and decrement binaryCtn
-                self.binaryCtn -= 1
-
-                if self.binaryCtn == 0:
-                    frame = ''
-                    for b in self.rxBuffer:
-                        frame += hex(b)[2:]
-
-                    print("Full frame received: {}".format(frame))
-
+        if len(data) > 0:
+            if data == self.START_SYMBOL:
+                # We start frame reception
+                self.readingFrame = True
+                self.rxBuffer = []  # Clear rx buffer
+            elif self.readingFrame:  # If we already received the start symbol
+                # We check if we received the end symbol (!)
+                if data == self.END_SYMBOL:
                     return self.rxBuffer
-
-                # Check if rxBuffer is too big
-                # 255 is the longer frame supported in Arduino code
-                if len(self.rxBuffer) > 255:
-                    print("Too long frame received")
-                    self.rxBuffer = []
-                    self.binaryCtn = 0
-                    return
-
-            elif self.binaryCtn == -1:  # current byte is supposed to be frame length (0-255)
-                self.binaryCtn = data
-                # print("Start reading frame: {} byte(s) long".format(self.binaryCtn))
-            elif data == self.START_HEAD:  # // If we are not receiving new data, we wait SOH
-                # Once SOH is received, the next byte indicates the data length
-                # By changing binaryCtn, we activate binary receiving. Next step will be to read frame length
-                self.binaryCtn = -1
-                self.rxBuffer = []      # Clear rx buffer
+                # otherwise we check that we didn't miss the stop symbol (frame too big)
+                elif len(self.rxBuffer) > 255:
+                    # ... if so, we wait for a new frame
+                    self.readingFrame = False
+                    self.rxBuffer = []           # Clear rx buffer
+                else:    # if not, we simply store data
+                    self.rxBuffer.append(data)
+            else:
+                pass    # We wait for the start symbol
 
         return None
