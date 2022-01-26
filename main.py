@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from BinaryCodeHandler import BinaryCodeParser
 from FrameEncoder import FrameEncoder
+from FrameDecoder import FrameDecoder
 from CodeConverter import CodeConverter
 from SshHandler import SshHandler
 from FileHandler import FileHandler
@@ -8,12 +9,45 @@ from CodeImplementations.Ev3DevPythonCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
 from CodeImplementations.PybricksCodeImpl import *
-from UartCom import UartCom
-from Gpio import Gpio
+# from UartCom import UartCom
+# from Gpio import Gpio
 
+
+frame = FrameEncoder('definitionAscii.xml')
+
+frame.appendBlock('h_on_start')
+frame.appendBlock('wait_seconds', {'seconds': 15})
+frame.appendBlock('c_forever')
+boolean = frame.encodeBoolean('b_touch', {'port': '1'})
+frame.appendBlock('c_if', {'boolean': boolean})
+frame.appendBlock('set_status_light', {'color': 'GREEN'})
+frame.appendBlock('motors_start_speed', {'port': 'B', 'direction': 'clockwise', 'speed': 50})
+frame.appendBlock('wait_touch', {'port': '1', 'state': 'released'})
+frame.appendBlock('c_else')
+frame.appendBlock('motors_stop', {'port': 'B'})
+frame.appendBlock('set_status_light', {'color': 'RED'})
+frame.appendBlock('wait_touch', {'port': '1', 'state': 'pressed'})
+frame.appendBlock('c_end')
+
+frame.print()
+
+decoder = FrameDecoder('definitionAscii.xml')
+
+frame = frame.get()
+
+code = decoder.parseFrame(frame[:-4])
+print(code)
+exit()
+graphicCodeImpl = GraphicCodeImpl()
+codeConverterGraphic = CodeConverter(graphicCodeImpl)
+codeConverterGraphic.convert(code)
+
+codeConverterGraphic.display()
+
+exit()
 
 # Load xmlParser
-binaryHandler = BinaryCodeParser('definition.xml')
+binaryHandler = BinaryCodeParser('definitionAscii.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevPythonCodeImpl PybricksCodeImpl

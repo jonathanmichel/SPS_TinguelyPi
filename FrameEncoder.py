@@ -1,3 +1,12 @@
+"""
+Author: Jonathan Michel
+Date:   26.01.2022
+This class encodes a string that represents the frame that could be received from the Arduino blocks. It is used to
+allow adding lines to a received frame or debug the program behaviour without using the Arduinos.
+This frame represents a Scratch program with each block having a unique id and a  pre-defined list of parameters.
+The protocol is specified in an XML file that has to be passed to the constructor, see the documentation for
+additional information.
+"""
 import xml.etree.ElementTree as ET
 
 
@@ -207,13 +216,13 @@ class FrameEncoder:
                 # Get str representation of the value
                 val_str = str(int(argument['value']))
                 if len(val_str) > argument['size']:
-                    print("Unable to encode argument {}, '{}' can not be represented in a string with {} chars."
+                    print("Unable to encode argument {}, '{}' can not be represented in a string with {} chars. "
                           "Check argument size in .xml definition"
                           .format(argument['name'], argument['value'], argument['size']))
                     return None
 
                 # Give correct size to string representation
-                val_str = val_str.zfill(self.idSize)
+                val_str = val_str.zfill(argument['size'])
 
                 return val_str
             elif argument['type'] == 'enum':
