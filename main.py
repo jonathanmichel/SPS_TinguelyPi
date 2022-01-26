@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from BinaryCodeHandler import BinaryCodeParser
 from FrameEncoder import FrameEncoder
 from FrameDecoder import FrameDecoder
 from CodeConverter import CodeConverter
@@ -9,45 +8,13 @@ from CodeImplementations.Ev3DevPythonCodeImpl import *
 from CodeImplementations.PythonCodeImpl import *
 from CodeImplementations.GraphicCodeImpl import *
 from CodeImplementations.PybricksCodeImpl import *
-# from UartCom import UartCom
-# from Gpio import Gpio
+from UartCom import UartCom
+from Gpio import Gpio
 
-
-frame = FrameEncoder('definitionAscii.xml')
-
-frame.appendBlock('h_on_start')
-frame.appendBlock('wait_seconds', {'seconds': 15})
-frame.appendBlock('c_forever')
-boolean = frame.encodeBoolean('b_touch', {'port': '1'})
-frame.appendBlock('c_if', {'boolean': boolean})
-frame.appendBlock('set_status_light', {'color': 'GREEN'})
-frame.appendBlock('motors_start_speed', {'port': 'B', 'direction': 'clockwise', 'speed': 50})
-frame.appendBlock('wait_touch', {'port': '1', 'state': 'released'})
-frame.appendBlock('c_else')
-frame.appendBlock('motors_stop', {'port': 'B'})
-frame.appendBlock('set_status_light', {'color': 'RED'})
-frame.appendBlock('wait_touch', {'port': '1', 'state': 'pressed'})
-frame.appendBlock('c_end')
-
-frame.print()
-
+# Load decoder with xml definition
 decoder = FrameDecoder('definitionAscii.xml')
-
-frame = frame.get()
-
-code = decoder.parseFrame(frame[:-4])
-print(code)
-exit()
-graphicCodeImpl = GraphicCodeImpl()
-codeConverterGraphic = CodeConverter(graphicCodeImpl)
-codeConverterGraphic.convert(code)
-
-codeConverterGraphic.display()
-
-exit()
-
-# Load xmlParser
-binaryHandler = BinaryCodeParser('definitionAscii.xml')
+# Load encoder with xml definition
+encoder = FrameEncoder('definitionAscii.xml')
 
 # Chose here which code implementation you want
 # GraphicCodeImpl PythonCodeImpl Ev3DevPythonCodeImpl PybricksCodeImpl
@@ -80,37 +47,30 @@ try:
         # Read full frame received from UART
         frame = uartCom.readRx()
         if frame:
-            # Convert frame array to str binary chain
-            binaryCode = binaryHandler.convertIntArrayToBinaryChain(frame)
-
-            # Append h_on_start at the beginning of the code read from Arduino
-            binaryCode = binaryHandler.encodeBlock('h_on_start') + binaryCode
+            # Append h_on_start at the beginning of the frame read from Arduino
+            frame = encoder.encodeBlock('h_on.start') + '|' + frame
 
             """
-            #  Software generated binary code (debug)
-            try:
-                binaryCode = ''
-                binaryCode += binaryHandler.encodeBlock('h_on_start')
-                boolean = binaryHandler.encodeBoolean('b_touch', {'port': '1'})
-                binaryCode += binaryHandler.encodeBlock('c_forever')
-                binaryCode += binaryHandler.encodeBlock('c_if', {'boolean': boolean})
-                binaryCode += binaryHandler.encodeBlock('set_status_light', {'color': 'GREEN'})
-                binaryCode += binaryHandler.encodeBlock('motors_start_speed',
-                                                        {'port': 'B', 'direction': 'clockwise', 'speed': 50})
-                binaryCode += binaryHandler.encodeBlock('wait_touch', {'port': '1', 'state': 'released'})
-                binaryCode += binaryHandler.encodeBlock('c_else')
-                binaryCode += binaryHandler.encodeBlock('motors_stop', {'port': 'B'})
-                binaryCode += binaryHandler.encodeBlock('set_status_light', {'color': 'RED'})
-                binaryCode += binaryHandler.encodeBlock('wait_touch', {'port': '1', 'state': 'pressed'})
-                binaryCode += binaryHandler.encodeBlock('c_end')
-                binaryCode += binaryHandler.encodeBlock('c_end')
-            except TypeError:
-                print("/!\\ Unable to correctly create binary chain")
-                exit()
+            #  Software generated binary code (debug)            
+            frame.appendBlock('h_on_start')
+            frame.appendBlock('wait_seconds', {'seconds': 15})
+            frame.appendBlock('c_forever')
+            boolean = frame.encodeBoolean('b_touch', {'port': '1'})
+            frame.appendBlock('c_if', {'boolean': boolean})
+            frame.appendBlock('set_status_light', {'color': 'GREEN'})
+            frame.appendBlock('motors_start_speed', {'port': 'B', 'direction': 'clockwise', 'speed': 50})
+            frame.appendBlock('wait_touch', {'port': '1', 'state': 'released'})
+            frame.appendBlock('c_else')
+            frame.appendBlock('motors_stop', {'port': 'B'})
+            frame.appendBlock('set_status_light', {'color': 'RED'})
+            frame.appendBlock('wait_touch', {'port': '1', 'state': 'pressed'})
+            frame.appendBlock('c_end')
+            
+            frame.print()
             """
 
             # Generate code array from binary chain
-            code_array = binaryHandler.parse(binaryCode)
+            code_array = decoder.parse(frame)
 
             if code_array:
                 # Convert code array in a graphical representation for debug purposes
