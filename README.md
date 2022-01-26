@@ -15,7 +15,7 @@ See [requirements.txt](requirements.txt)
 
 ## Code structure
 
-Supported Scratch blocks are listed in [definition.xml](definition.xml). Each block has an unique ID and a pre-defined list of parameters.
+Supported Scratch blocks are listed in [definitionAscii.xml](definitionAscii.xml). Each block has an unique ID and a pre-defined list of parameters.
 
 For each block, an implementation has to be provided as described in [CodeImpl.py](CodeImplementations/CodeImpl.py). Currently, four implementations exist.   
 

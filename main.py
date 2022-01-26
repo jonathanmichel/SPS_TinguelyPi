@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from BinaryCodeHandler import BinaryCodeParser
+from FrameEncoder import FrameEncoder
 from CodeConverter import CodeConverter
 from SshHandler import SshHandler
 from FileHandler import FileHandler

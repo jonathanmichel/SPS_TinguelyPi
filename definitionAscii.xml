@@ -1,0 +1,210 @@
+<data>
+    <info>
+        <version>3.0</version>
+        <idSize>2</idSize>  <!-- 2 bytes - Hex value -->
+    </info>
+    <blocks>
+        <block name="c_end">
+            <id>0x0</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+        <block name="motors_run_direction">
+            <id>0xD</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="A">A</enum>
+                    <enum value="B">B</enum>
+                    <enum value="C">C</enum>
+                    <enum value="D">D</enum>
+                </port>
+                <direction size="1" type="enum">
+                    <enum value="r">clockwise</enum> <!-- right -->
+                    <enum value="l">counterclockwise</enum> <!-- left -->
+                </direction>
+                <unit size="1" type="enum">
+                    <enum value="r">rotations</enum>    <!-- rot -->
+                    <enum value="d">degrees</enum>      <!-- deg -->
+                    <enum value="s">seconds</enum>      <!-- sec -->
+                </unit>
+                <value size="3" type="uint"/>  <!-- 000 ... 999 -->
+            </arguments>
+        </block>
+        <block name="motors_start_speed">
+            <id>0xE</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="A">A</enum>
+                    <enum value="B">B</enum>
+                    <enum value="C">C</enum>
+                    <enum value="D">D</enum>
+                </port>
+                <direction size="1" type="enum">
+                    <enum value="r">clockwise</enum> <!-- right -->
+                    <enum value="l">counterclockwise</enum> <!-- left -->
+                </direction>
+                <speed size="3" type="uint"/>   <!-- 000 ... 100 % -->
+            </arguments>
+        </block>
+
+        <block name="motors_stop">
+            <id>0xF</id>
+            <type>stack</type>
+            <family>motors</family>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="A">A</enum>
+                    <enum value="B">B</enum>
+                    <enum value="C">C</enum>
+                    <enum value="D">D</enum>
+                </port>
+            </arguments>
+        </block>
+        <block name="set_status_light">
+            <id>0x16</id>
+            <type>stack</type>
+            <family>display</family>
+            <arguments>
+                <color size="1" type="enum">
+                    <enum value="b">BLACK</enum>
+                    <enum value="g">GREEN</enum>
+                    <enum value="r">RED</enum>
+                    <enum value="o">ORANGE</enum>
+                </color>
+            </arguments>
+        </block>
+        <block name="wait_seconds">
+            <id>0x1F</id>
+            <type>stack</type>
+            <family>control</family>
+            <arguments>
+                <seconds size="2" type="uint"/> <!-- 00 - 99 -->
+            </arguments>
+        </block>
+        <block name="wait_touch">
+            <id>0x20</id>
+            <type>stack</type>
+            <family>sensors</family>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="1">1</enum>
+                    <enum value="2">2</enum>
+                    <enum value="3">3</enum>
+                    <enum value="4">4</enum>
+                </port>
+                <state size="1" type="enum">
+                    <enum value="p">pressed</enum>
+                    <enum value="r">released</enum>
+                </state>
+            </arguments>
+        </block>
+        <block name="wait_until">
+            <id>0x21</id>
+            <type>stack</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
+        </block>
+        <block name="h_on_start">
+            <id>0x2E</id>
+            <type>hat</type>
+            <family>events</family>
+        </block>
+        <block name="c_forever">
+            <id>0x38</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+        <block name="c_if">
+            <id>0x39</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
+        </block>
+        <block name="c_repeat">
+            <id>0x3B</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <times size="2" type="uint"/> <!-- 00 - 99 -->
+            </arguments>
+        </block>
+        <block name="c_repeat_until">
+            <id>0x3C</id>
+            <type>c</type>
+            <family>control</family>
+            <arguments>
+                <boolean type="binary"/>
+            </arguments>
+        </block>
+        <block name="set_trap_door">
+            <id>0x64</id>
+            <type>stack</type>
+            <family>custom</family>
+            <arguments>
+                <state size="1" type="enum">
+                    <enum value="c">close</enum>
+                    <enum value="o">open</enum>
+                </state>
+            </arguments>
+        </block>
+        <block name="start_crawler">
+            <id>0x65</id>
+            <type>stack</type>
+            <family>custom</family>
+            <arguments>
+                <direction size="1" type="enum">
+                    <enum value="l">clockwise</enum> <!-- left -->
+                    <enum value="r">counterclockwise</enum> <!-- right -->
+                </direction>
+            </arguments>
+        </block>
+        <block name="c_else">
+            <id>0x7F</id>
+            <type>c</type>
+            <family>control</family>
+        </block>
+    </blocks>
+
+    <booleans>
+        <boolean name="b_distance">
+            <id>0x41</id>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="1">1</enum>
+                    <enum value="2">2</enum>
+                    <enum value="3">3</enum>
+                    <enum value="4">4</enum>
+                </port>
+                <operator size="1" type="enum">
+                    <enum value="e">equal</enum>
+                    <enum value="g">greater</enum>
+                    <enum value="l">less</enum>
+                </operator>
+                <value size="3" type="uint"/> <!-- 000 - 999 -->
+                <unit size="1" type="enum">
+                    <enum value="c">cm</enum>
+                    <enum value="i">inches</enum>
+                </unit>
+            </arguments>
+        </boolean>
+        <boolean name="b_touch">
+            <id>0x43</id>
+            <arguments>
+                <port size="1" type="enum">
+                    <enum value="1">1</enum>
+                    <enum value="2">2</enum>
+                    <enum value="3">3</enum>
+                    <enum value="4">4</enum>
+                </port>
+            </arguments>
+        </boolean>
+    </booleans>
+</data>
