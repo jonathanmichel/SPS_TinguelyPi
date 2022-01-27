@@ -151,7 +151,7 @@ class FrameDecoder:
 
                 arg_value = self.decodeArgumentValue(arg_type, arg_value, arg)
 
-                if arg_value:
+                if arg_value is not None:
                     # print("\tArgument found: {} - type: {}, size: {}, value: {}"
                     #       .format(arg.tag, arg_type, arg_size, arg_value))
 
@@ -208,7 +208,6 @@ class FrameDecoder:
         except ValueError as ve:  # Unable to convert value
             print("/!\\ Decoding failed, unable to convert '{}' as type '{}'"
                   .format(argValue, argType))
-            print(ve)
             return None
 
         return arg_value
