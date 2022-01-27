@@ -17,7 +17,7 @@ class Gpio:
 
         # Uses physical pin numbers on the GPIO connector
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(self.LAUNCH_GPIO, GPIO.IN)
+        GPIO.setup(self.LAUNCH_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def isKeyPressed(self):
         if GPIO.input(self.LAUNCH_GPIO):
