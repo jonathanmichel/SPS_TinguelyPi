@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+from datetime import datetime
+import os
+
 from FrameEncoder import FrameEncoder
 from FrameDecoder import FrameDecoder
 from CodeConverter import CodeConverter
@@ -47,8 +50,12 @@ try:
         # Read full frame received from UART
         frame = uartCom.readRx()
         if frame:
+            os.system('clear')
+            lastUpdate = datetime.now()
+            print("Received frame at {}: {}".format(lastUpdate.strftime("%H:%M:%S"), frame))
+
             # Append h_on_start at the beginning of the frame read from Arduino
-            frame = encoder.encodeBlock('h_on.start') + '|' + frame
+            frame = encoder.encodeBlock('h_on_start') + '|' + frame
 
             """
             #  Software generated binary code (debug)            
@@ -70,7 +77,7 @@ try:
             """
 
             # Generate code array from binary chain
-            code_array = decoder.parse(frame)
+            code_array = decoder.parseFrame(frame)
 
             if code_array:
                 # Convert code array in a graphical representation for debug purposes
