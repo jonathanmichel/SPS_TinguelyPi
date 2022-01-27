@@ -23,8 +23,8 @@
 class AsciiDrawer:
     def __init__(self, codeImpl):
         self.blockLength = 60
-        self.levelShiftSize = 4
-        self.notchSize = 4
+        self.levelShiftSize = 8
+        self.notchSize = 5
         self.concatenateBlocks = True
         self.codeImpl = codeImpl
 
@@ -59,18 +59,18 @@ class AsciiDrawer:
     def drawUpperNotch(self, level, openRoof=False):
         self.drawNotchLine("-", level, openRoof)
         # |  \___/                               |
-        self.addLine("|   " +
+        self.addLine("|" + " " * (self.levelShiftSize - 1) +
                      " " * self.levelShiftSize * level +
-                     "\\__/" +
-                     " " * (self.blockLength - self.notchSize - (self.levelShiftSize * level) - 4 - 1) +
-                     "|")
+                     "\\" + '_' * (self.notchSize - 2) + "/" +
+                     " " * (self.blockLength - self.notchSize - (self.levelShiftSize * level) - self.levelShiftSize - 1)
+                     + "|")
 
     def drawLowerNotch(self, level):
         self.drawNotchLine("_", level)
         #     \___/                              |
-        self.addLine("    " +
+        self.addLine(" " * self.levelShiftSize +
                      (" " * self.notchSize) * level +
-                     "\\__/")
+                     "\\" + '_' * (self.notchSize - 2) + "/")
 
     def drawHatTop(self):
         hat_size = 12
