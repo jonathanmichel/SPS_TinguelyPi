@@ -137,10 +137,10 @@ class FrameEncoder:
         if boolean:
             # Booleans are preceded by one char that indicates boolean binary in hex
             bin_length = len(boolean)
-
+            
             # Encode length with one char
             if bin_length > 0xF:
-                print("Unable to encode {}. Boolean too big, size can not be encoded in two chars."
+                print("Unable to encode {}. Boolean too big, size can not be specified with one char."
                       .format(booleanName))
                 return None
 
@@ -172,7 +172,7 @@ class FrameEncoder:
                         required_args.append(a.tag)
 
                     print("/!\\ Argument encoding for '{}' failed. "
-                          "Please specify arguments '{}' when calling encoding function."
+                          "Please specify argument(s) {} when calling encoding function."
                           .format(elementName, required_args))
                     return None
 
